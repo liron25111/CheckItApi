@@ -15,6 +15,7 @@ namespace CheckItBL.Models
         {
             Forms = new HashSet<Form>();
             Organizations = new HashSet<Organization>();
+            StaffMemberOfGroups = new HashSet<StaffMemberOfGroup>();
         }
 
         [Key]
@@ -33,5 +34,7 @@ namespace CheckItBL.Models
         public virtual ICollection<Form> Forms { get; set; }
         [InverseProperty(nameof(Organization.ManagerNavigation))]
         public virtual ICollection<Organization> Organizations { get; set; }
+        [InverseProperty(nameof(StaffMemberOfGroup.StaffMember))]
+        public virtual ICollection<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }
     }
 }

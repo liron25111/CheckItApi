@@ -14,5 +14,12 @@ namespace CheckItBL.Models
         public int IdOfGroup { get; set; }
         [Key]
         public int FormId { get; set; }
+
+        [ForeignKey(nameof(FormId))]
+        [InverseProperty("FormsOfGroups")]
+        public virtual Form Form { get; set; }
+        [ForeignKey(nameof(IdOfGroup))]
+        [InverseProperty(nameof(Class.FormsOfGroups))]
+        public virtual Class IdOfGroupNavigation { get; set; }
     }
 }

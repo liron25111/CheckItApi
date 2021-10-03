@@ -11,6 +11,11 @@ namespace CheckItBL.Models
     [Index(nameof(FormType), Name = "forms_formtype_index")]
     public partial class Form
     {
+        public Form()
+        {
+            FormsOfGroups = new HashSet<FormsOfGroup>();
+        }
+
         [StringLength(255)]
         public string FormType { get; set; }
         [Required]
@@ -30,5 +35,9 @@ namespace CheckItBL.Models
         [ForeignKey(nameof(Sender))]
         [InverseProperty(nameof(StaffMember.Forms))]
         public virtual StaffMember SenderNavigation { get; set; }
+        [InverseProperty("IdOfFormNavigation")]
+        public virtual Signform Signform { get; set; }
+        [InverseProperty(nameof(FormsOfGroup.Form))]
+        public virtual ICollection<FormsOfGroup> FormsOfGroups { get; set; }
     }
 }

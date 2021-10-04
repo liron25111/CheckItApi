@@ -33,7 +33,7 @@ namespace CheckItBL.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server =LAPTOP-RF95KAVF\\MSSQLSERVER01; Database=Confirmation; Trusted_Connection=true");
+                optionsBuilder.UseSqlServer("Server = LAPTOP-RF95KAVF\\MSSQLSERVER01; Database=Confirmation; Trusted_Connection=true");
             }
         }
 
@@ -109,11 +109,11 @@ namespace CheckItBL.Models
 
                 entity.Property(e => e.SchoolId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.ManagerNavigation)
+                entity.HasOne(d => d.Manager)
                     .WithMany(p => p.Organizations)
-                    .HasForeignKey(d => d.Manager)
+                    .HasForeignKey(d => d.ManagerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("organizations_manager_foreign");
+                    .HasConstraintName("StaffMemberId_foreign");
             });
 
             modelBuilder.Entity<Signform>(entity =>
@@ -132,6 +132,14 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<StaffMember>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.StaffMember)
+                    .HasForeignKey<StaffMember>(d => d.Id)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("AccountIdStaffMember_foreign");
+
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.StaffMembers)
                     .HasForeignKey(d => d.SchoolId)
@@ -159,12 +167,11 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<Student>(entity =>
             {
-                entity.Property(e => e.StudentId).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.Family)
+                entity.HasOne(d => d.IdNavigation)
                     .WithOne(p => p.Student)
-                    .HasPrincipalKey<Account>(p => p.FamilyId)
-                    .HasForeignKey<Student>(d => d.FamilyId)
+                    .HasForeignKey<Student>(d => d.Id)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Students_familyId_foreign");
             });

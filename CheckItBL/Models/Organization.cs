@@ -18,14 +18,18 @@ namespace CheckItBL.Models
 
         [Key]
         public int SchoolId { get; set; }
-        public int Manager { get; set; }
+        public int ManagerId { get; set; }
         [Required]
         [StringLength(255)]
         public string OrganizationName { get; set; }
+        public int MashovSchoolId { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string MashovPass { get; set; }
 
-        [ForeignKey(nameof(Manager))]
+        [ForeignKey(nameof(ManagerId))]
         [InverseProperty(nameof(StaffMember.Organizations))]
-        public virtual StaffMember ManagerNavigation { get; set; }
+        public virtual StaffMember Manager { get; set; }
         [InverseProperty(nameof(Class.School))]
         public virtual ICollection<Class> Classes { get; set; }
         [InverseProperty(nameof(StaffMember.School))]

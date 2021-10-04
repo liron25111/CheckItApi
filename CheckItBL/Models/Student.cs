@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckItBL.Models
 {
-    [Index(nameof(FamilyId), Name = "FamilyId_unique", IsUnique = true)]
     public partial class Student
     {
         public Student()
@@ -17,13 +16,15 @@ namespace CheckItBL.Models
         }
 
         [Key]
-        public int StudentId { get; set; }
-        public int FamilyId { get; set; }
+        public int Id { get; set; }
+        public int ParentId { get; set; }
         [Required]
         [StringLength(255)]
         public string StudentName { get; set; }
 
-        public virtual Account Family { get; set; }
+        [ForeignKey(nameof(Id))]
+        [InverseProperty(nameof(Account.Student))]
+        public virtual Account IdNavigation { get; set; }
         [InverseProperty(nameof(ClientsInGroup.Client))]
         public virtual ICollection<ClientsInGroup> ClientsInGroups { get; set; }
     }

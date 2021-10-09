@@ -19,12 +19,12 @@ namespace CheckItApi.Controllers
         {
             this.context = context;
         }
-        [Route("SignUpAccount")]
-        [HttpPost]
-        public AccountDTO SignUpAccount([FromBody] AccountDTO newAccount)
-        {
+        //[Route("SignUpAccount")]
+        //[HttpPost]
+        //public AccountDTO SignUpAccount([FromBody] AccountDTO newAccount)
+        //{
 
-        }
+        //}
         #endregion
 
     }

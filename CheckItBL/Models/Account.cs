@@ -23,7 +23,8 @@ namespace CheckItBL.Models
         [Required]
         [StringLength(255)]
         public string Email { get; set; }
-        public bool IsActive { get; set; }
+        [Required]
+        public bool? IsActive { get; set; }
 
         [InverseProperty("IdNavigation")]
         public virtual StaffMember StaffMember { get; set; }

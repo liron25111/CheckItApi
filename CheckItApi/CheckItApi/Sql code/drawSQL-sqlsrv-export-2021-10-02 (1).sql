@@ -7,7 +7,7 @@ CREATE TABLE Account(
     Pass NVARCHAR(255) NOT NULL,
     Id INT NOT NULL IDENTITY(1000,1),
     Email NVARCHAR(255) NOT NULL,
-    IsActive BIT NOT NULL
+    IsActive BIT NOT NULL default 1
 );
 
 ALTER TABLE

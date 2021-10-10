@@ -25,6 +25,9 @@ namespace CheckItBL.Models
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Signform> Signforms { get; set; }
         public virtual DbSet<StaffMember> StaffMembers { get; set; }
+
+       
+
         public virtual DbSet<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }
         public virtual DbSet<Student> Students { get; set; }
 
@@ -40,6 +43,11 @@ namespace CheckItBL.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Hebrew_CI_AS");
+
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            });
 
             modelBuilder.Entity<Class>(entity =>
             {

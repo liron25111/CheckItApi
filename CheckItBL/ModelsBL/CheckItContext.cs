@@ -17,5 +17,18 @@ namespace CheckItBL.Models
 
             return user;
         }
+         
+        public void ChangePass(string email, string pass)
+        {
+            Account a = this.Accounts.FirstOrDefault(a => a.Email == email);
+
+            if (a != null)
+            {
+                a.Pass = pass;
+
+                this.SaveChanges();
+            }
+        }
+        public Account GetAccountByEmail(string email) => this.Accounts.FirstOrDefault(a => a.Email == email);
     }
 }

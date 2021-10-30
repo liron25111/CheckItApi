@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CheckItBL.Models;
 using CheckItApi.DTO;
+using CheckItApi.Services
 
 namespace CheckItApi.Controllers
 {
@@ -19,6 +20,7 @@ namespace CheckItApi.Controllers
         {
             this.context = context;
         }
+        #endregion
         //[Route("SignUpAccount")]
         //[HttpPost]
         //public AccountDTO SignUpAccount([FromBody] AccountDTO newAccount)
@@ -48,7 +50,51 @@ namespace CheckItApi.Controllers
                 return null;
             }
         }
-        #endregion
+
+
+        [Route("ResetPass")]
+        [HttpGet]
+        public Account ResetPass([FromQuery] string pass)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+            if (user != null )
+            {
+                context.ChangePass(user.Email, pass);
+
+                return user;
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return null;
+            }
+        }
+        [Route("ForgotPassword")]
+        [HttpGet]
+
+        public bool ForgotPassword([FromQuery] string Email)
+        {
+            bool succeed = false;
+            Account account = context.GetAccountByEmail(Email);
+            if(account!= null)
+            {
+                EmailSender.SendEmail("Password Recovery", $"Your Password is {account.Pass} ", $"{ account.Email}", $"{ account.Username}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
+                succeed = true;
+            }
+            return succeed;
+        }
+
+
+
+
+
+
 
     }
 }

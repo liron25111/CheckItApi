@@ -9,7 +9,10 @@ CREATE TABLE Account(
     Email NVARCHAR(255) NOT NULL,
     IsActive BIT NOT NULL default 1
 );
-
+Create Table AccountOrganizations(
+   AccountId int Not Null,
+   OragnizationId int Not Null,
+);
 ALTER TABLE
     Account ADD CONSTRAINT account_id_primary PRIMARY KEY(Id);
 CREATE UNIQUE INDEX account_email_unique ON
@@ -40,11 +43,18 @@ CREATE TABLE Organizations(
     ManagerId INT NOT NULL,
     OrganizationName NVARCHAR(255) NOT NULL,
 	MashovSchoolId INT NOT NULL,
-    MashovPass NVARCHAR(255) NOT NULL
+   
 	
 );
 ALTER TABLE
     Organizations ADD CONSTRAINT organizations_schoolid_primary PRIMARY KEY(SchoolId);
+Alter Table
+   AccountOrganizations Add CONSTRAINT AccountOrganizationsPK PRIMARY KEY(AccountId,OragnizationId);
+Alter Table
+ AccountOrganizations Add CONSTRAINT AOO Foreign Key(OragnizationId) References Organizations(SchoolId);
+ Alter Table
+ AccountOrganizations Add CONSTRAINT AOA Foreign Key(AccountId) References Account(Id);
+
 CREATE TABLE Class(
     ClassName NVARCHAR(255) NOT NULL,
     GroupId INT NOT NULL,
@@ -128,6 +138,9 @@ StaffMember ADD CONSTRAINT AccountIdStaffMember_foreign FOREIGN KEY(Id) REFERENC
 
 ALTER TABLE
 Organizations ADD CONSTRAINT StaffMemberId_foreign FOREIGN KEY(ManagerId) REFERENCES StaffMember(Id);
+Alter Table
+Organizations ADD CONSTRAINT Account_Organizations Foreign Key(ManagerId) References Account(Id);
+
 
 
 

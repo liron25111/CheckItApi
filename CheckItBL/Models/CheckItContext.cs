@@ -18,6 +18,7 @@ namespace CheckItBL.Models
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<AccountOrganization> AccountOrganizations { get; set; }
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<ClientsInGroup> ClientsInGroups { get; set; }
         public virtual DbSet<Form> Forms { get; set; }
@@ -25,9 +26,6 @@ namespace CheckItBL.Models
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Signform> Signforms { get; set; }
         public virtual DbSet<StaffMember> StaffMembers { get; set; }
-
-       
-
         public virtual DbSet<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }
         public virtual DbSet<Student> Students { get; set; }
 
@@ -36,7 +34,7 @@ namespace CheckItBL.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server = LAPTOP-RF95KAVF\\MSSQLSERVER01; Database=Confirmation; Trusted_Connection=true");
+                optionsBuilder.UseSqlServer("Server = localhost\\SQLEXPRESS; Database=Confirmation; Trusted_Connection=true");
             }
         }
 
@@ -47,6 +45,24 @@ namespace CheckItBL.Models
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            });
+
+            modelBuilder.Entity<AccountOrganization>(entity =>
+            {
+                entity.HasKey(e => new { e.AccountId, e.OragnizationId })
+                    .HasName("AccountOrganizationsPK");
+
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.AccountOrganizations)
+                    .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("AOA");
+
+                entity.HasOne(d => d.Oragnization)
+                    .WithMany(p => p.AccountOrganizations)
+                    .HasForeignKey(d => d.OragnizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("AOO");
             });
 
             modelBuilder.Entity<Class>(entity =>
@@ -118,6 +134,12 @@ namespace CheckItBL.Models
                 entity.Property(e => e.SchoolId).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Manager)
+                    .WithMany(p => p.Organizations)
+                    .HasForeignKey(d => d.ManagerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Account_Organizations");
+
+                entity.HasOne(d => d.ManagerNavigation)
                     .WithMany(p => p.Organizations)
                     .HasForeignKey(d => d.ManagerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)

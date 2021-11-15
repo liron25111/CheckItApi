@@ -34,7 +34,7 @@ namespace CheckItBL.Models
         public virtual Organization School { get; set; }
         [InverseProperty(nameof(Form.SenderNavigation))]
         public virtual ICollection<Form> Forms { get; set; }
-        [InverseProperty(nameof(Organization.Manager))]
+        [InverseProperty(nameof(Organization.ManagerNavigation))]
         public virtual ICollection<Organization> Organizations { get; set; }
         [InverseProperty(nameof(StaffMemberOfGroup.StaffMember))]
         public virtual ICollection<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }

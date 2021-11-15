@@ -32,8 +32,6 @@ namespace CheckItApi.Services
             smtp.Send(message);
         }
     }
-    static void Main(string[] args)
-    {
-    }
+   
 }
 }

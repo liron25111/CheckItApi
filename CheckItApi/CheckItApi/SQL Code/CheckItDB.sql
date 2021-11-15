@@ -1,0 +1,12 @@
+Use Confirmation
+go
+
+
+
+
+INSERT INTO Account (Username, Pass,Email)
+VALUES ('Yaniv','1234','yanivp1414@gmail.com');
+
+
+
+

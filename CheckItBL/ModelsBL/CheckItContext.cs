@@ -30,5 +30,16 @@ namespace CheckItBL.Models
             }
         }
         public Account GetAccountByEmail(string email) => this.Accounts.FirstOrDefault(a => a.Email == email);
+        public (int, int) GetFormSigns(int formId)
+        {
+            Form form = Forms.Find(formId);
+            int signed = form.Signforms.Count;
+            int total = 0;
+            foreach(FormsOfGroup f in form.FormsOfGroups)
+            {
+                total += f.IdOfGroupNavigation.SumPeople();
+            }
+            return (total, signed);
+        }
     }
 }

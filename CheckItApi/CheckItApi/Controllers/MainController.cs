@@ -93,7 +93,29 @@ namespace CheckItApi.Controllers
             }
             return succeed;
         }
+        [Route("GetSignPeople")]
+        [HttpGet]
+        public (int,int) GetSignPeople([FromQuery] int formId, [FromQuery] string Email)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return (-1,-1);
+            }
+            Account account = context.GetAccountByEmail(Email);
 
+            if (user != null)
+            {
+                return context.GetFormSigns(formId);
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return (-1,-1);
+            }
+        }
 
 
 

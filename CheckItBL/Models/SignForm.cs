@@ -14,6 +14,7 @@ namespace CheckItBL.Models
     public partial class Signform
     {
         [Key]
+        public int SignFormId { get; set; }
         public int IdOfForm { get; set; }
         public int PerentSignId { get; set; }
         public int GroupId { get; set; }
@@ -21,7 +22,7 @@ namespace CheckItBL.Models
         public DateTime SignTime { get; set; }
 
         [ForeignKey(nameof(IdOfForm))]
-        [InverseProperty(nameof(Form.Signform))]
+        [InverseProperty(nameof(Form.Signforms))]
         public virtual Form IdOfFormNavigation { get; set; }
     }
 }

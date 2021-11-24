@@ -14,6 +14,7 @@ namespace CheckItBL.Models
         public Form()
         {
             FormsOfGroups = new HashSet<FormsOfGroup>();
+            Signforms = new HashSet<Signform>();
         }
 
         [StringLength(255)]
@@ -35,9 +36,9 @@ namespace CheckItBL.Models
         [ForeignKey(nameof(Sender))]
         [InverseProperty(nameof(StaffMember.Forms))]
         public virtual StaffMember SenderNavigation { get; set; }
-        [InverseProperty("IdOfFormNavigation")]
-        public virtual Signform Signform { get; set; }
         [InverseProperty(nameof(FormsOfGroup.Form))]
         public virtual ICollection<FormsOfGroup> FormsOfGroups { get; set; }
+        [InverseProperty(nameof(Signform.IdOfFormNavigation))]
+        public virtual ICollection<Signform> Signforms { get; set; }
     }
 }

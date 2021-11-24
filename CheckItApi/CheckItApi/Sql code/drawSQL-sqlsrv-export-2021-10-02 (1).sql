@@ -85,6 +85,7 @@ ALTER TABLE
     FormsOfGroups ADD CONSTRAINT formsofgroups_idofgroup_primary PRIMARY KEY(IdOfGroup,FormId);
 
 CREATE TABLE Signform(
+    SignFormId INT NOT NULL IDENTITY(1000,1),
     IdOfForm INT NOT NULL,
     PerentSignId INT NOT NULL,
     GroupId INT NOT NULL,
@@ -99,7 +100,7 @@ CREATE TABLE Students(
 ALTER TABLE
     Students ADD CONSTRAINT students_id_primary PRIMARY KEY(Id);
 ALTER TABLE
-    Signform ADD CONSTRAINT sign_forms_idofform_primary PRIMARY KEY(IdOfForm);
+    Signform ADD CONSTRAINT sign_forms_idofform_primary PRIMARY KEY(SignFormId);
 CREATE UNIQUE INDEX sign_forms_perentsignid_unique ON
     Signform(PerentSignId);
 CREATE UNIQUE INDEX Signform_groupid_unique ON

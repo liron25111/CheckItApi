@@ -148,14 +148,9 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<Signform>(entity =>
             {
-                entity.HasKey(e => e.IdOfForm)
-                    .HasName("sign_forms_idofform_primary");
-
-                entity.Property(e => e.IdOfForm).ValueGeneratedNever();
-
                 entity.HasOne(d => d.IdOfFormNavigation)
-                    .WithOne(p => p.Signform)
-                    .HasForeignKey<Signform>(d => d.IdOfForm)
+                    .WithMany(p => p.Signforms)
+                    .HasForeignKey(d => d.IdOfForm)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Sign_Forms_IdOfForm_foreign");
             });

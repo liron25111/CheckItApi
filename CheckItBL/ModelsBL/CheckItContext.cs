@@ -41,5 +41,16 @@ namespace CheckItBL.Models
             }
             return (total, signed);
         }
+
+
+        public List<Form> GetFormsByAccount(int id)
+        {
+            var res = from cInG in this.ClientsInGroups
+                      join grp in this.FormsOfGroups on cInG.GroupId equals (grp.IdOfGroup)
+                      where cInG.ClientId == id
+                      select grp.Form;
+            return res.ToList();
+        }
+
     }
 }

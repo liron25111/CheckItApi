@@ -39,8 +39,8 @@ CREATE INDEX forms_formtype_index ON
 ALTER TABLE
     Forms ADD CONSTRAINT forms_formid_primary PRIMARY KEY(FormId);
 CREATE TABLE Organizations(
-    SchoolId INT NOT NULL,
-    ManagerId INT NOT NULL,
+    SchoolId INT NOT NULL (1000,1),
+    ManagerId INT,
     OrganizationName NVARCHAR(255) NOT NULL,
 	MashovSchoolId INT NOT NULL,
    
@@ -57,7 +57,7 @@ Alter Table
 
 CREATE TABLE Class(
     ClassName NVARCHAR(255) NOT NULL,
-    GroupId INT NOT NULL,
+    GroupId INT NOT NULL identity(1000,1),
     SchoolId INT NOT NULL,
     YearTime INT NOT NULL
 );

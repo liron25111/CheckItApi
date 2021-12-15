@@ -116,7 +116,28 @@ namespace CheckItApi.Controllers
                 return (-1,-1);
             }
         }
+        [Route("GetForms")]
+        [HttpGet]
+        public List<Form> GetForms([FromQuery] int clientId)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
 
+            if (user != null)
+            {
+                return context.GetFormsByAccount(clientId);
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return null;
+            }
+        }
 
 
 

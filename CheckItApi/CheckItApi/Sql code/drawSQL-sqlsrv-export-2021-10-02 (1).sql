@@ -1,3 +1,6 @@
+drop database Confirmation
+go
+
 Create database Confirmation
 go
 use Confirmation;
@@ -39,7 +42,7 @@ CREATE INDEX forms_formtype_index ON
 ALTER TABLE
     Forms ADD CONSTRAINT forms_formid_primary PRIMARY KEY(FormId);
 CREATE TABLE Organizations(
-    SchoolId INT NOT NULL (1000,1),
+    SchoolId INT NOT NULL identity (1000,1),
     ManagerId INT,
     OrganizationName NVARCHAR(255) NOT NULL,
 	MashovSchoolId INT NOT NULL,

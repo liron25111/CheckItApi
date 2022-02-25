@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using CheckItBL.Models;
 using CheckItApi.DTO;
 using CheckItApi.Services;
-
+using System.IO;
 
 namespace CheckItApi.Controllers
 {
@@ -139,7 +139,37 @@ namespace CheckItApi.Controllers
             }
         }
 
+        [Route("uploadFile")]
+        [HttpPost]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
 
+            if (user != null)
+            {
+                if (file == null)
+                {
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imgs", file.FileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    return Ok(new { length = file.Length, name = file.FileName });
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return BadRequest();
+                }
+            }
+            return Forbid();
+        }
 
 
 

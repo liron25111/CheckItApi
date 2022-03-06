@@ -8,6 +8,7 @@ using CheckItBL.Models;
 using CheckItApi.DTO;
 using CheckItApi.Services;
 using System.IO;
+using Spire.Xls;
 
 namespace CheckItApi.Controllers
 {
@@ -141,7 +142,7 @@ namespace CheckItApi.Controllers
 
         [Route("uploadFile")]
         [HttpPost]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImage([FromBody] IFormFile file)
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
 
@@ -154,12 +155,35 @@ namespace CheckItApi.Controllers
 
                 try
                 {
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imgs", file.FileName);
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Files", file.FileName);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
                     }
 
+                    Workbook wb = new Workbook();
+                    wb.LoadFromFile("test.xlsx");
+                    Worksheet ws = wb.Worksheets[0];
+
+                    List<Account> list = new List<Account>();
+                    int row = 4;
+
+                    while (!string.IsNullOrEmpty(ws[row, 1].Value))
+                    {
+                        Account a = new Account()
+                        {
+                            Username = ws[row, 14].Value,
+                            Pass = ws[row, 2].Value,
+                            Id = 0,
+                            Email = ws[row, 14].Value,
+                            IsActive = true
+                        };
+                        list.Add(a);
+                        row++;
+                    }
+
+                    //Class g = context.CreateGroup(user.Id, list);
+            
                     return Ok(new { length = file.Length, name = file.FileName });
                 }
                 catch (Exception e)

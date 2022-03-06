@@ -15,7 +15,8 @@ namespace CheckItBL.Models
         public Account()
         {
             AccountOrganizations = new HashSet<AccountOrganization>();
-            Organizations = new HashSet<Organization>();
+            SignForms = new HashSet<SignForm>();
+            Students = new HashSet<Student>();
         }
 
         [Required]
@@ -29,16 +30,13 @@ namespace CheckItBL.Models
         [Required]
         [StringLength(255)]
         public string Email { get; set; }
-        [Required]
-        public bool? IsActive { get; set; }
+        public bool IsActiveStudent { get; set; }
 
-        [InverseProperty("IdNavigation")]
-        public virtual StaffMember StaffMember { get; set; }
-        [InverseProperty("IdNavigation")]
-        public virtual Student Student { get; set; }
         [InverseProperty(nameof(AccountOrganization.Account))]
         public virtual ICollection<AccountOrganization> AccountOrganizations { get; set; }
-        [InverseProperty(nameof(Organization.Manager))]
-        public virtual ICollection<Organization> Organizations { get; set; }
+        [InverseProperty(nameof(SignForm.AccountNavigation))]
+        public virtual ICollection<SignForm> SignForms { get; set; }
+        [InverseProperty(nameof(Student.Parent))]
+        public virtual ICollection<Student> Students { get; set; }
     }
 }

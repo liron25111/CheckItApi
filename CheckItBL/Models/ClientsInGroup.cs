@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckItBL.Models
 {
-    [Table("Clients_in_Group")]
+    [Table("ClientsInGroup")]
     public partial class ClientsInGroup
     {
         [Key]

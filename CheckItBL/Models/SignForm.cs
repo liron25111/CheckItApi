@@ -8,21 +8,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckItBL.Models
 {
-    [Table("Signform")]
-    [Index(nameof(GroupId), Name = "Signform_groupid_unique", IsUnique = true)]
-    [Index(nameof(PerentSignId), Name = "sign_forms_perentsignid_unique", IsUnique = true)]
-    public partial class Signform
+    public partial class SignForm
     {
         [Key]
-        public int SignFormId { get; set; }
         public int IdOfForm { get; set; }
-        public int PerentSignId { get; set; }
-        public int GroupId { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime SignTime { get; set; }
+        [Key]
+        public int Account { get; set; }
+        public TimeSpan SignatureTime { get; set; }
 
+        [ForeignKey(nameof(Account))]
+        [InverseProperty("SignForms")]
+        public virtual Account AccountNavigation { get; set; }
         [ForeignKey(nameof(IdOfForm))]
-        [InverseProperty(nameof(Form.Signforms))]
+        [InverseProperty(nameof(Form.SignForms))]
         public virtual Form IdOfFormNavigation { get; set; }
     }
 }

@@ -9,34 +9,36 @@ using Microsoft.EntityFrameworkCore;
 namespace CheckItBL.Models
 {
     [Table("StaffMember")]
+    [Index(nameof(Email), Name = "staffmember_email_unique", IsUnique = true)]
     public partial class StaffMember
     {
         public StaffMember()
         {
-            Forms = new HashSet<Form>();
+            Classes = new HashSet<Class>();
             Organizations = new HashSet<Organization>();
-            StaffMemberOfGroups = new HashSet<StaffMemberOfGroup>();
         }
 
         [Key]
+        [Column("id")]
         public int Id { get; set; }
         [Required]
         [StringLength(255)]
         public string MemberName { get; set; }
         public int PositionName { get; set; }
         public int SchoolId { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string Pass { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string Email { get; set; }
 
-        [ForeignKey(nameof(Id))]
-        [InverseProperty(nameof(Account.StaffMember))]
-        public virtual Account IdNavigation { get; set; }
         [ForeignKey(nameof(SchoolId))]
         [InverseProperty(nameof(Organization.StaffMembers))]
         public virtual Organization School { get; set; }
-        [InverseProperty(nameof(Form.SenderNavigation))]
-        public virtual ICollection<Form> Forms { get; set; }
-        [InverseProperty(nameof(Organization.ManagerNavigation))]
+        [InverseProperty(nameof(Class.StaffMemberOfGroupNavigation))]
+        public virtual ICollection<Class> Classes { get; set; }
+        [InverseProperty(nameof(Organization.Manager))]
         public virtual ICollection<Organization> Organizations { get; set; }
-        [InverseProperty(nameof(StaffMemberOfGroup.StaffMember))]
-        public virtual ICollection<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }
     }
 }

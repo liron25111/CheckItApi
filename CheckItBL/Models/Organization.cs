@@ -13,7 +13,6 @@ namespace CheckItBL.Models
         public Organization()
         {
             AccountOrganizations = new HashSet<AccountOrganization>();
-            Classes = new HashSet<Class>();
             StaffMembers = new HashSet<StaffMember>();
         }
 
@@ -26,15 +25,10 @@ namespace CheckItBL.Models
         public int MashovSchoolId { get; set; }
 
         [ForeignKey(nameof(ManagerId))]
-        [InverseProperty(nameof(Account.Organizations))]
-        public virtual Account Manager { get; set; }
-        [ForeignKey(nameof(ManagerId))]
         [InverseProperty(nameof(StaffMember.Organizations))]
-        public virtual StaffMember ManagerNavigation { get; set; }
-        [InverseProperty(nameof(AccountOrganization.Oragnization))]
+        public virtual StaffMember Manager { get; set; }
+        [InverseProperty(nameof(AccountOrganization.Organization))]
         public virtual ICollection<AccountOrganization> AccountOrganizations { get; set; }
-        [InverseProperty(nameof(Class.School))]
-        public virtual ICollection<Class> Classes { get; set; }
         [InverseProperty(nameof(StaffMember.School))]
         public virtual ICollection<StaffMember> StaffMembers { get; set; }
     }

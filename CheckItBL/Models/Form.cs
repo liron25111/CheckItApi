@@ -13,8 +13,7 @@ namespace CheckItBL.Models
     {
         public Form()
         {
-            FormsOfGroups = new HashSet<FormsOfGroup>();
-            Signforms = new HashSet<Signform>();
+            SignForms = new HashSet<SignForm>();
         }
 
         [StringLength(255)]
@@ -27,18 +26,15 @@ namespace CheckItBL.Models
         [StringLength(255)]
         public string MassageBody { get; set; }
         public int StatusOfTheMessage { get; set; }
-        public int Sender { get; set; }
         [Key]
         public int FormId { get; set; }
-        [Column(TypeName = "datetime")]
-        public DateTime TimeSend { get; set; }
+        public int GroupId { get; set; }
+        public TimeSpan Time { get; set; }
 
-        [ForeignKey(nameof(Sender))]
-        [InverseProperty(nameof(StaffMember.Forms))]
-        public virtual StaffMember SenderNavigation { get; set; }
-        [InverseProperty(nameof(FormsOfGroup.Form))]
-        public virtual ICollection<FormsOfGroup> FormsOfGroups { get; set; }
-        [InverseProperty(nameof(Signform.IdOfFormNavigation))]
-        public virtual ICollection<Signform> Signforms { get; set; }
+        [ForeignKey(nameof(GroupId))]
+        [InverseProperty(nameof(Class.Forms))]
+        public virtual Class Group { get; set; }
+        [InverseProperty(nameof(SignForm.IdOfFormNavigation))]
+        public virtual ICollection<SignForm> SignForms { get; set; }
     }
 }

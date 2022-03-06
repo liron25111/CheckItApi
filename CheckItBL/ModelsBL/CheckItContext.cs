@@ -52,5 +52,9 @@ namespace CheckItBL.Models
             return res.ToList();
         }
 
+        //public Class CreateClass(int id, List<Account> accounts, string className)
+        //{
+        //    this.Classes.Add(new Class() { ClassName = className, SchoolId = schoolId  )
+        //}
     }
 }

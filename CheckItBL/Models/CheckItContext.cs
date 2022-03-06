@@ -22,11 +22,9 @@ namespace CheckItBL.Models
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<ClientsInGroup> ClientsInGroups { get; set; }
         public virtual DbSet<Form> Forms { get; set; }
-        public virtual DbSet<FormsOfGroup> FormsOfGroups { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
-        public virtual DbSet<Signform> Signforms { get; set; }
+        public virtual DbSet<SignForm> SignForms { get; set; }
         public virtual DbSet<StaffMember> StaffMembers { get; set; }
-        public virtual DbSet<StaffMemberOfGroup> StaffMemberOfGroups { get; set; }
         public virtual DbSet<Student> Students { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -44,25 +42,25 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<Account>(entity =>
             {
-                entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+                entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
             modelBuilder.Entity<AccountOrganization>(entity =>
             {
-                entity.HasKey(e => new { e.AccountId, e.OragnizationId })
-                    .HasName("AccountOrganizationsPK");
+                entity.HasKey(e => new { e.AccountId, e.OrganizationId })
+                    .HasName("accountorganizations_accountid_primary");
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.AccountOrganizations)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("AOA");
+                    .HasConstraintName("account_Id_foreign");
 
-                entity.HasOne(d => d.Oragnization)
+                entity.HasOne(d => d.Organization)
                     .WithMany(p => p.AccountOrganizations)
-                    .HasForeignKey(d => d.OragnizationId)
+                    .HasForeignKey(d => d.OrganizationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("AOO");
+                    .HasConstraintName("AccountOrganizations_OrganizationId_foreign");
             });
 
             modelBuilder.Entity<Class>(entity =>
@@ -72,58 +70,40 @@ namespace CheckItBL.Models
 
                 entity.Property(e => e.GroupId).ValueGeneratedNever();
 
-                entity.HasOne(d => d.School)
+                entity.HasOne(d => d.StaffMemberOfGroupNavigation)
                     .WithMany(p => p.Classes)
-                    .HasForeignKey(d => d.SchoolId)
+                    .HasForeignKey(d => d.StaffMemberOfGroup)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("group_schoolid_foreign");
+                    .HasConstraintName("group_staffmemberofgroup_foreign");
             });
 
             modelBuilder.Entity<ClientsInGroup>(entity =>
             {
                 entity.HasKey(e => new { e.ClientId, e.GroupId })
-                    .HasName("clients_in_group_clientid_primary");
+                    .HasName("clientsingroup_clientid_primary");
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.ClientsInGroups)
                     .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Clients_in_Group_ClientId_foreign");
+                    .HasConstraintName("ClientsInGroup_ClientId_foreign");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.ClientsInGroups)
                     .HasForeignKey(d => d.GroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Clients_in_Group_GroupId_foreign");
+                    .HasConstraintName("ClientsInGroup_GroupId_foreign");
             });
 
             modelBuilder.Entity<Form>(entity =>
             {
-                entity.HasOne(d => d.SenderNavigation)
+                entity.Property(e => e.FormId).ValueGeneratedNever();
+
+                entity.HasOne(d => d.Group)
                     .WithMany(p => p.Forms)
-                    .HasForeignKey(d => d.Sender)
+                    .HasForeignKey(d => d.GroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("forms_sender_foreign");
-            });
-
-            modelBuilder.Entity<FormsOfGroup>(entity =>
-            {
-                entity.HasKey(e => new { e.IdOfGroup, e.FormId })
-                    .HasName("formsofgroups_idofgroup_primary");
-
-                entity.Property(e => e.FormId).ValueGeneratedOnAdd();
-
-                entity.HasOne(d => d.Form)
-                    .WithMany(p => p.FormsOfGroups)
-                    .HasForeignKey(d => d.FormId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FormsOfGroups_IdOfForm_foreign");
-
-                entity.HasOne(d => d.IdOfGroupNavigation)
-                    .WithMany(p => p.FormsOfGroups)
-                    .HasForeignKey(d => d.IdOfGroup)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FormsOfGroups_IdOfGroup_foreign");
+                    .HasConstraintName("forms_groupid_foreign");
             });
 
             modelBuilder.Entity<Organization>(entity =>
@@ -137,68 +117,47 @@ namespace CheckItBL.Models
                     .WithMany(p => p.Organizations)
                     .HasForeignKey(d => d.ManagerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Account_Organizations");
-
-                entity.HasOne(d => d.ManagerNavigation)
-                    .WithMany(p => p.Organizations)
-                    .HasForeignKey(d => d.ManagerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("StaffMemberId_foreign");
+                    .HasConstraintName("Organizations_ManagerId_foreign");
             });
 
-            modelBuilder.Entity<Signform>(entity =>
+            modelBuilder.Entity<SignForm>(entity =>
             {
+                entity.HasKey(e => new { e.IdOfForm, e.Account })
+                    .HasName("signforms_idofform_primary");
+
+                entity.HasOne(d => d.AccountNavigation)
+                    .WithMany(p => p.SignForms)
+                    .HasForeignKey(d => d.Account)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("account_Idform_foreign");
+
                 entity.HasOne(d => d.IdOfFormNavigation)
-                    .WithMany(p => p.Signforms)
+                    .WithMany(p => p.SignForms)
                     .HasForeignKey(d => d.IdOfForm)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Sign_Forms_IdOfForm_foreign");
+                    .HasConstraintName("SignForms_IdOfForm_foreign");
             });
 
             modelBuilder.Entity<StaffMember>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.StaffMember)
-                    .HasForeignKey<StaffMember>(d => d.Id)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("AccountIdStaffMember_foreign");
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.StaffMembers)
                     .HasForeignKey(d => d.SchoolId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("staff_member_schoolid_foreign");
-            });
-
-            modelBuilder.Entity<StaffMemberOfGroup>(entity =>
-            {
-                entity.HasKey(e => new { e.StaffMemberId, e.GroupId })
-                    .HasName("staffmemberofgroup_staffmemberid_primary");
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.StaffMemberOfGroups)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("StaffMemberOfGroup_GroupId_foreign");
-
-                entity.HasOne(d => d.StaffMember)
-                    .WithMany(p => p.StaffMemberOfGroups)
-                    .HasForeignKey(d => d.StaffMemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("StaffMemberOfGroup_Id_foreign");
+                    .HasConstraintName("staffmember_schoolid_foreign");
             });
 
             modelBuilder.Entity<Student>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.Student)
-                    .HasForeignKey<Student>(d => d.Id)
+                entity.HasOne(d => d.Parent)
+                    .WithMany(p => p.Students)
+                    .HasForeignKey(d => d.ParentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Students_familyId_foreign");
+                    .HasConstraintName("students_parentid_foreign");
             });
 
             OnModelCreatingPartial(modelBuilder);

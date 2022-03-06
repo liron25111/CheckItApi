@@ -13,13 +13,13 @@ namespace CheckItBL.Models
         [Key]
         public int AccountId { get; set; }
         [Key]
-        public int OragnizationId { get; set; }
+        public int OrganizationId { get; set; }
 
         [ForeignKey(nameof(AccountId))]
         [InverseProperty("AccountOrganizations")]
         public virtual Account Account { get; set; }
-        [ForeignKey(nameof(OragnizationId))]
-        [InverseProperty(nameof(Organization.AccountOrganizations))]
-        public virtual Organization Oragnization { get; set; }
+        [ForeignKey(nameof(OrganizationId))]
+        [InverseProperty("AccountOrganizations")]
+        public virtual Organization Organization { get; set; }
     }
 }

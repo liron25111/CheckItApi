@@ -9,6 +9,7 @@ using CheckItApi.DTO;
 using CheckItApi.Services;
 using System.IO;
 using Spire.Xls;
+using System.Text;
 
 namespace CheckItApi.Controllers
 {
@@ -23,8 +24,8 @@ namespace CheckItApi.Controllers
             this.context = context;
         }
         #endregion
-        //[Route("SignUpAccount")]
-        //[HttpPost]
+        [Route("SignUpAccount")]
+        [HttpPost]
         //public AccountDTO SignUpAccount([FromBody] AccountDTO newAccount)
         //{
 
@@ -67,7 +68,7 @@ namespace CheckItApi.Controllers
             }
             Account account = context.GetAccountByEmail(Email);
 
-            if (user != null )
+            if (user != null)
             {
                 context.ChangePass(user.Email, pass);
                 EmailSender.SendEmail("Your Password Changed", $"Your New Password is {account.Pass} ", $"{ account.Email}", $"{ account.Username}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
@@ -84,37 +85,47 @@ namespace CheckItApi.Controllers
         [Route("ForgotPassword")]
         [HttpGet]
         public bool ForgotPassword([FromQuery] string Email)
-        { 
+        {
             bool succeed = false;
             Account account = context.GetAccountByEmail(Email);
-            if(account!= null)
+            if (account != null)
             {
                 EmailSender.SendEmail("Password Recovery", $"Your Password is {account.Pass} ", $"{ account.Email}", $"{ account.Username}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
                 succeed = true;
             }
             return succeed;
         }
+        [Route("Signs")]
+        [HttpGet]
+        public int Signs([FromQuery] int formId)
+        {
+            if(context.GetForm(formId) == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return 0;
+            }
+            return context.Signs(formId);
+        }
         [Route("GetSignPeople")]
         [HttpGet]
-        public (int,int) GetSignPeople([FromQuery] int formId, [FromQuery] string Email)
+        public bool GetSignPeople([FromQuery] int formId, [FromQuery] string Email)
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
             //Check if user logged in and its ID is the same as the contact user ID
             if (user == null)
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
-                return (-1,-1);
+                return false;
             }
-            Account account = context.GetAccountByEmail(Email);
 
             if (user != null)
             {
-                return context.GetFormSigns(formId);
+                return context.IsSigned(Email,formId);
             }
             else
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-                return (-1,-1);
+                return false;
             }
         }
         [Route("GetForms")]
@@ -140,13 +151,13 @@ namespace CheckItApi.Controllers
             }
         }
 
-        [Route("uploadFile")]
+        [Route("UploadExcel")]
         [HttpPost]
-        public async Task<IActionResult> UploadImage([FromBody] IFormFile file)
+        public async Task<IActionResult> UploadExcel() // [FromBody] IFormFile file
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
-
-            if (user != null)
+            IFormFile file = Request.Form.Files[0];
+            if (user != null || user == null)
             {
                 if (file == null)
                 {
@@ -161,8 +172,9 @@ namespace CheckItApi.Controllers
                         await file.CopyToAsync(stream);
                     }
 
+
                     Workbook wb = new Workbook();
-                    wb.LoadFromFile("test.xlsx");
+                    wb.LoadFromFile(path);
                     Worksheet ws = wb.Worksheets[0];
 
                     List<Account> list = new List<Account>();
@@ -176,14 +188,15 @@ namespace CheckItApi.Controllers
                             Pass = ws[row, 2].Value,
                             Id = 0,
                             Email = ws[row, 14].Value,
-                            IsActive = true
+                            //IsActive = true
                         };
                         list.Add(a);
                         row++;
                     }
 
+                    context.Entry(list[0]).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                     //Class g = context.CreateGroup(user.Id, list);
-            
+
                     return Ok(new { length = file.Length, name = file.FileName });
                 }
                 catch (Exception e)
@@ -193,9 +206,71 @@ namespace CheckItApi.Controllers
                 }
             }
             return Forbid();
+
+        }
+        [Route("uploadFile")]
+        [HttpPost]
+        public async Task<IActionResult> UploadFile([FromBody]  IFormFile file) // [FromBody] IFormFile file
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            if (user != null)
+                {
+                    if (file == null)
+                    {
+                        return BadRequest();
+                    }
+
+                    try
+                    {
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Files", file.FileName);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        Workbook wb = new Workbook();
+                        wb.LoadFromFile("test.xlsx");
+                        Worksheet ws = wb.Worksheets[0];
+
+                        List<Account> list = new List<Account>();
+                        int row = 4;
+
+                        while (!string.IsNullOrEmpty(ws[row, 1].Value))
+                        {
+                        Account a = context.GetAccount(ws[row, 14].Value);
+                        if (a == null)
+                        {
+                            a = new Account()
+                            {
+                                Username = ws[row, 2].Value,
+                                Pass = "1234",
+                                Id = 0,
+                                Email = ws[row, 14].Value,
+                                IsActiveStudent = true
+                            };
+                            context.AddAccount(a);
+                            Student s = new Student() { Id = a.Id, Name = ws[row, 3].Value + " " + ws[row, 4].Value };
+                            context.AddStudent(s);
+                        }
+                            list.Add(a);
+                            row++;
+                        
+                        }
+
+                        Class g = context.CreateClass(user.Id, list,ws[1,1].Value);
+
+                        return Ok(new { length = file.Length, name = file.FileName });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        return BadRequest();
+                    }
+                }
+            return Forbid();
         }
 
-
-
     }
+
 }
+

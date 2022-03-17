@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace CheckItBL.Models
+namespace CheckItApi.Models
 {
     public partial class CheckItContext : DbContext
     {
@@ -41,6 +40,11 @@ namespace CheckItBL.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Hebrew_CI_AS");
 
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
             modelBuilder.Entity<AccountOrganization>(entity =>
             {
                 entity.HasKey(e => new { e.AccountId, e.OrganizationId })
@@ -63,6 +67,8 @@ namespace CheckItBL.Models
             {
                 entity.HasKey(e => e.GroupId)
                     .HasName("group_groupid_primary");
+
+                entity.Property(e => e.GroupId).ValueGeneratedNever();
 
                 entity.HasOne(d => d.StaffMemberOfGroupNavigation)
                     .WithMany(p => p.Classes)
@@ -91,6 +97,8 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<Form>(entity =>
             {
+                entity.Property(e => e.FormId).ValueGeneratedNever();
+
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.Forms)
                     .HasForeignKey(d => d.GroupId)
@@ -145,20 +153,16 @@ namespace CheckItBL.Models
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.Student)
-                    .HasForeignKey<Student>(d => d.Id)
+                entity.HasOne(d => d.Parent)
+                    .WithMany(p => p.Students)
+                    .HasForeignKey(d => d.ParentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("students_Id_foreign");
+                    .HasConstraintName("students_parentid_foreign");
             });
 
             OnModelCreatingPartial(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-
-
-
     }
 }

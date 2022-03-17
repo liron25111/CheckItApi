@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace CheckItBL.Models
+namespace CheckItApi.Models
 {
     [Table("Account")]
     [Index(nameof(Email), Name = "account_email_unique", IsUnique = true)]
@@ -16,6 +16,7 @@ namespace CheckItBL.Models
         {
             AccountOrganizations = new HashSet<AccountOrganization>();
             SignForms = new HashSet<SignForm>();
+            Students = new HashSet<Student>();
         }
 
         [Required]
@@ -31,11 +32,11 @@ namespace CheckItBL.Models
         public string Email { get; set; }
         public bool IsActiveStudent { get; set; }
 
-        [InverseProperty("IdNavigation")]
-        public virtual Student Student { get; set; }
         [InverseProperty(nameof(AccountOrganization.Account))]
         public virtual ICollection<AccountOrganization> AccountOrganizations { get; set; }
         [InverseProperty(nameof(SignForm.AccountNavigation))]
         public virtual ICollection<SignForm> SignForms { get; set; }
+        [InverseProperty(nameof(Student.Parent))]
+        public virtual ICollection<Student> Students { get; set; }
     }
 }

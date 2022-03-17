@@ -5,7 +5,7 @@ go
 CREATE TABLE Account(
     Username NVARCHAR(255) NOT NULL,
     Pass NVARCHAR(255) NOT NULL,
-    Id INT NOT NULL,
+    Id INT NOT NULL IDENTITY(1,1000),
     Email NVARCHAR(255) NOT NULL,
     IsActiveStudent BIT NOT NULL
 );
@@ -30,7 +30,7 @@ CREATE TABLE Forms(
     topic NVARCHAR(255) NOT NULL,
     massageBody NVARCHAR(255) NULL,
     StatusOfTheMessage INT NOT NULL,
-    FormId INT NOT NULL,
+    FormId INT NOT NULL IDENTITY(1,10000),
     GroupId INT NOT NULL,
     Time TIME NOT NULL
 );
@@ -49,7 +49,7 @@ ALTER TABLE
 CREATE TABLE Class(
     ClassName NVARCHAR(255) NOT NULL,
     StaffMemberOfGroup INT NOT NULL,
-    GroupId INT NOT NULL,
+    GroupId INT NOT NULL IDENTITY(1,1000),
     ClassYear NVARCHAR(255) NOT NULL
 );
 ALTER TABLE
@@ -69,7 +69,6 @@ ALTER TABLE
     SignForms ADD CONSTRAINT signforms_idofform_primary PRIMARY KEY(IdOfForm,Account);
 CREATE TABLE Students(
     id INT NOT NULL,
-    ParentId INT NOT NULL,
     Name NVARCHAR(255) NOT NULL
 );
 ALTER TABLE
@@ -88,7 +87,7 @@ ALTER TABLE
 ALTER TABLE
     Forms ADD CONSTRAINT forms_groupid_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
 ALTER TABLE
-    Students ADD CONSTRAINT students_parentid_foreign FOREIGN KEY(ParentId) REFERENCES Account(Id);
+    Students ADD CONSTRAINT students_Id_foreign FOREIGN KEY(Id) REFERENCES Account(Id);
 ALTER TABLE
     AccountOrganizations ADD CONSTRAINT account_Id_foreign FOREIGN KEY(AccountId) REFERENCES Account(Id);
 ALTER TABLE

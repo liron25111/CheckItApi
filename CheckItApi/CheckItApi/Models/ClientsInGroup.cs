@@ -6,21 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
-namespace CheckItBL.Models
+namespace CheckItApi.Models
 {
-    [Table("StaffMemberOfGroup")]
-    public partial class StaffMemberOfGroup
+    [Table("ClientsInGroup")]
+    public partial class ClientsInGroup
     {
         [Key]
-        public int StaffMemberId { get; set; }
+        public int ClientId { get; set; }
         [Key]
         public int GroupId { get; set; }
 
+        [ForeignKey(nameof(ClientId))]
+        [InverseProperty(nameof(Student.ClientsInGroups))]
+        public virtual Student Client { get; set; }
         [ForeignKey(nameof(GroupId))]
-        [InverseProperty(nameof(Class.StaffMemberOfGroups))]
+        [InverseProperty(nameof(Class.ClientsInGroups))]
         public virtual Class Group { get; set; }
-        [ForeignKey(nameof(StaffMemberId))]
-        [InverseProperty("StaffMemberOfGroups")]
-        public virtual StaffMember StaffMember { get; set; }
     }
 }

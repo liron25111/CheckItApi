@@ -17,7 +17,25 @@ namespace CheckItBL.Models
 
             return user;
         }
-         
+
+        public bool IsSigned(string email,int formId)
+        {
+            return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId) != null;
+        }
+        public Account GetAccount(string email) => Accounts.Where(a => a.Email == email).FirstOrDefault();
+        public void AddAccount(Account a)
+        {
+            Accounts.Add(a);
+            this.SaveChanges();
+        }
+        public int Signs(int formId)
+        {
+            return this.SignForms.Count(s => s.IdOfFormNavigation.FormId == formId);
+        }
+        public Form GetForm(int formId)
+        {
+            return this.Forms.Where(f => f.FormId == formId).FirstOrDefault();
+        }
         public void ChangePass(string email, string pass)
         {
             Account a = this.Accounts.FirstOrDefault(a => a.Email == email);
@@ -30,31 +48,35 @@ namespace CheckItBL.Models
             }
         }
         public Account GetAccountByEmail(string email) => this.Accounts.FirstOrDefault(a => a.Email == email);
-        public (int, int) GetFormSigns(int formId)
-        {
-            Form form = Forms.Find(formId);
-            int signed = form.Signforms.Count;
-            int total = 0;
-            foreach(FormsOfGroup f in form.FormsOfGroups)
-            {
-                total += f.IdOfGroupNavigation.SumPeople();
-            }
-            return (total, signed);
-        }
+
 
 
         public List<Form> GetFormsByAccount(int id)
         {
-            var res = from cInG in this.ClientsInGroups
-                      join grp in this.FormsOfGroups on cInG.GroupId equals (grp.IdOfGroup)
-                      where cInG.ClientId == id
-                      select grp.Form;
-            return res.ToList();
+            List<SignForm> signForms = SignForms.Where(s => s.AccountNavigation.Id == id).ToList<SignForm>();
+            List<Form> forms = new List<Form>();
+            foreach(SignForm form in signForms)
+            {
+                forms.Add(form.IdOfFormNavigation);
+            }
+            return forms;
         }
 
-        //public Class CreateClass(int id, List<Account> accounts, string className)
-        //{
-        //    this.Classes.Add(new Class() { ClassName = className, SchoolId = schoolId  )
-        //}
+        public Class CreateClass(int id, List<Account> accounts, string className)
+        {
+            Class c = new Class() { ClassName = className, StaffMemberOfGroup = id, ClassYear = DateTime.Now.Year.ToString() };
+            Classes.Add(c);
+            foreach(Account a in accounts)
+            {
+                ClientsInGroups.Add(new ClientsInGroup() { ClientId = a.Id, GroupId = c.GroupId });
+            }
+            this.SaveChanges();
+            return c;
+        }
+        public void AddStudent(Student s)
+        {
+            Students.Add(s);
+            this.SaveChanges();
+        }
     }
 }

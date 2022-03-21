@@ -177,24 +177,61 @@ namespace CheckItApi.Controllers
                     wb.LoadFromFile(path);
                     Worksheet ws = wb.Worksheets[0];
 
+                    //List<Account> list = new List<Account>();
+                    //int row = 4;
+
+                    //while (!string.IsNullOrEmpty(ws[row, 1].Value))
+                    //{
+                    //    Account a = new Account()
+                    //    {
+                    //        Username = ws[row, 14].Value,
+                    //        Pass = ws[row, 2].Value,
+                    //        Id = 0,
+                    //        Email = ws[row, 14].Value,
+                    //        //IsActive = true
+                    //    };
+                    //    list.Add(a);
+                    //    row++;
+                    //}
                     List<Account> list = new List<Account>();
                     int row = 4;
 
                     while (!string.IsNullOrEmpty(ws[row, 1].Value))
                     {
-                        Account a = new Account()
+                        Account a = context.GetAccount(ws[row, 14].Value);
+                        if (a == null)
                         {
-                            Username = ws[row, 14].Value,
-                            Pass = ws[row, 2].Value,
-                            Id = 0,
-                            Email = ws[row, 14].Value,
-                            //IsActive = true
-                        };
+                            a = new Account()
+                            {
+                                Username = ws[row, 2].Value,
+                                Pass = "1234",
+                                Id = 0,
+                                Email = ws[row, 14].Value,
+                                IsActiveStudent = true
+                            };
+                            context.AddAccount(a);
+                            Student s = new Student() { Id = a.Id, Name = ws[row, 3].Value + " " + ws[row, 4].Value };
+                            context.AddStudent(s);
+                        }
+                        else
+                        {
+                            Student student = context.GetStudent(a.Id);
+                            if(student == null)
+                            {
+                                student = new Student() { Id = a.Id, Name = ws[row, 3].Value + " " + ws[row, 4].Value };
+                                context.AddStudent(student);
+
+                            }
+                        }
                         list.Add(a);
                         row++;
+
                     }
 
-                    context.Entry(list[0]).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    Class g = context.CreateClass(1001, list, ws[1, 1].Value);
+
+
+                    //context.Entry(list[0]).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                     //Class g = context.CreateGroup(user.Id, list);
 
                     return Ok(new { length = file.Length, name = file.FileName });
@@ -268,6 +305,18 @@ namespace CheckItApi.Controllers
                     }
                 }
             return Forbid();
+        }
+        [Route("GetClasses")]
+        [HttpGet]
+        public List<Class> GetClasses()
+        {
+            if (HttpContext.Session.GetObject<Account>("theUser") != null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                return context.GetClasses();
+            }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
         }
 
     }

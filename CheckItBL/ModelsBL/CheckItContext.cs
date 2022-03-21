@@ -18,7 +18,7 @@ namespace CheckItBL.Models
             return user;
         }
 
-        public bool IsSigned(string email,int formId)
+        public bool IsSigned(string email, int formId)
         {
             return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId) != null;
         }
@@ -35,6 +35,10 @@ namespace CheckItBL.Models
         public Form GetForm(int formId)
         {
             return this.Forms.Where(f => f.FormId == formId).FirstOrDefault();
+        }
+        public Student GetStudent(int id)
+        {
+            return this.Students.Where(s => s.Id == id).FirstOrDefault();
         }
         public void ChangePass(string email, string pass)
         {
@@ -55,7 +59,7 @@ namespace CheckItBL.Models
         {
             List<SignForm> signForms = SignForms.Where(s => s.AccountNavigation.Id == id).ToList<SignForm>();
             List<Form> forms = new List<Form>();
-            foreach(SignForm form in signForms)
+            foreach (SignForm form in signForms)
             {
                 forms.Add(form.IdOfFormNavigation);
             }
@@ -66,17 +70,20 @@ namespace CheckItBL.Models
         {
             Class c = new Class() { ClassName = className, StaffMemberOfGroup = id, ClassYear = DateTime.Now.Year.ToString() };
             Classes.Add(c);
-            foreach(Account a in accounts)
+            foreach (Account a in accounts)
             {
                 ClientsInGroups.Add(new ClientsInGroup() { ClientId = a.Id, GroupId = c.GroupId });
             }
-            this.SaveChanges();
             return c;
         }
         public void AddStudent(Student s)
         {
             Students.Add(s);
             this.SaveChanges();
+        }
+        public List<Class> GetClasses()
+        {
+            return this.Classes.ToList<Class>();
         }
     }
 }

@@ -297,8 +297,9 @@ namespace CheckItApi.Controllers
                         Class g = context.CreateClass(user.Id, list,ws[1,1].Value);
 
                         return Ok(new { length = file.Length, name = file.FileName });
-                    }
-                    catch (Exception e)
+
+                }
+                catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
                         return BadRequest();

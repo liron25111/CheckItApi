@@ -14,7 +14,7 @@ ALTER TABLE
 CREATE UNIQUE INDEX account_email_unique ON
     Account(Email);
 CREATE TABLE StaffMember(
-    id INT NOT NULL,
+    id INT NOT NULL IDENTITY(1,1000),
     MemberName NVARCHAR(255) NOT NULL,
     PositionName INT NOT NULL,
     SchoolId INT NOT NULL,
@@ -102,7 +102,7 @@ ALTER TABLE
 ALTER TABLE
     SignForms ADD CONSTRAINT SignForms_IdOfForm_foreign FOREIGN KEY(IdOfForm) REFERENCES Forms(FormId);
 
-	ALTER TABLE
+ALTER TABLE
     Organizations ADD CONSTRAINT Organizations_ManagerId_foreign FOREIGN KEY(ManagerId) REFERENCES StaffMember(id);
 
 

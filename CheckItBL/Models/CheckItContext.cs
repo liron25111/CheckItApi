@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -103,12 +102,9 @@ namespace CheckItBL.Models
                 entity.HasKey(e => e.SchoolId)
                     .HasName("organizations_schoolid_primary");
 
-                entity.Property(e => e.SchoolId).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Manager)
                     .WithMany(p => p.Organizations)
                     .HasForeignKey(d => d.ManagerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Organizations_ManagerId_foreign");
             });
 
@@ -132,12 +128,9 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<StaffMember>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.School)
                     .WithMany(p => p.StaffMembers)
                     .HasForeignKey(d => d.SchoolId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("staffmember_schoolid_foreign");
             });
 
@@ -156,9 +149,5 @@ namespace CheckItBL.Models
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-
-
-
     }
 }

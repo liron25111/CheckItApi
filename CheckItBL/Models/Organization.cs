@@ -18,7 +18,7 @@ namespace CheckItBL.Models
 
         [Key]
         public int SchoolId { get; set; }
-        public int ManagerId { get; set; }
+        public int? ManagerId { get; set; }
         [Required]
         [StringLength(255)]
         public string OrganizationName { get; set; }

@@ -55,7 +55,32 @@ namespace CheckItApi.Controllers
         }
 
 
-        [Route("ResetPass")]
+            [Route("Login2")]
+            [HttpGet]
+            public StaffMember Login2([FromQuery] string email, [FromQuery] string pass)
+            {
+            StaffMember user = context.Login2(email, pass);
+
+                //Check user name and password
+                if (user != null)
+                {
+                    HttpContext.Session.SetObject("theUser", user);
+
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+
+                    //Important! Due to the Lazy Loading, the user will be returned with all of its contects!!
+                    return user;
+                }
+                else
+                {
+
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                    return null;
+                }
+            }
+
+
+            [Route("ResetPass")]
         [HttpGet]
         public Account ResetPass([FromQuery] string pass, [FromQuery] string Email)
         {

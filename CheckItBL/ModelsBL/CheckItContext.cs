@@ -17,6 +17,13 @@ namespace CheckItBL.Models
 
             return user;
         }
+        public StaffMember Login2(string email, string pass)
+        {
+            StaffMember user = this.StaffMembers
+                .Where(u => u.Email == email && u.Pass == pass).FirstOrDefault();
+
+            return user;
+        }
 
         public bool IsSigned(string email, int formId)
         {

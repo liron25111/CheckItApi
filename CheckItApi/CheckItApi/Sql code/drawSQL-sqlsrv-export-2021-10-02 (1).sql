@@ -16,8 +16,7 @@ CREATE UNIQUE INDEX account_email_unique ON
 CREATE TABLE StaffMember(
     id INT NOT NULL IDENTITY(1,1000),
     MemberName NVARCHAR(255) NOT NULL,
-    PositionName INT NOT NULL,
-    SchoolId INT NOT NULL,
+    SchoolId INT ,
     Pass NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL
 );
@@ -39,8 +38,8 @@ CREATE INDEX forms_formtype_index ON
 ALTER TABLE
     Forms ADD CONSTRAINT forms_formid_primary PRIMARY KEY(FormId);
 CREATE TABLE Organizations(
-    SchoolId INT NOT NULL,
-    ManagerId INT NOT NULL,
+    SchoolId INT NOT NULL IDENTITY(1,1000),
+    ManagerId INT IDENTITY(1,1000),
     OrganizationName NVARCHAR(255) NOT NULL,
     MashovSchoolId INT NOT NULL
 );

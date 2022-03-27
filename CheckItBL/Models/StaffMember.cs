@@ -24,8 +24,7 @@ namespace CheckItBL.Models
         [Required]
         [StringLength(255)]
         public string MemberName { get; set; }
-        public int PositionName { get; set; }
-        public int SchoolId { get; set; }
+        public int? SchoolId { get; set; }
         [Required]
         [StringLength(255)]
         public string Pass { get; set; }

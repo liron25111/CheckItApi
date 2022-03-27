@@ -74,6 +74,7 @@ namespace CheckItBL.Models
             {
                 ClientsInGroups.Add(new ClientsInGroup() { ClientId = a.Id, GroupId = c.GroupId });
             }
+            this.SaveChanges();
             return c;
         }
         public void AddStudent(Student s)

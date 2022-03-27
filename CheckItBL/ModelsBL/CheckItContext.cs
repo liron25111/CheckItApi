@@ -58,9 +58,20 @@ namespace CheckItBL.Models
                 this.SaveChanges();
             }
         }
+        public void ChangePassStaffMember(string email, string pass)
+        {
+            StaffMember a = this.StaffMembers.FirstOrDefault(a => a.Email == email);
+
+            if (a != null)
+            {
+                a.Pass = pass;
+
+                this.SaveChanges();
+            }
+        }
         public Account GetAccountByEmail(string email) => this.Accounts.FirstOrDefault(a => a.Email == email);
 
-
+        public StaffMember GetStaffMemberByEmail(string email) => StaffMembers.Where(s => s.Email == email).FirstOrDefault();
 
         public List<Form> GetFormsByAccount(int id)
         {
@@ -72,11 +83,21 @@ namespace CheckItBL.Models
             }
             return forms;
         }
-
+        public List<Form> GetFormsByStaffMember(int id)
+        {
+            List<SignForm> signForms = SignForms.Where(s => s.IdOfFormNavigation.Group.StaffMemberOfGroup == id).ToList<SignForm>();
+            List<Form> forms = new List<Form>();
+            foreach (SignForm form in signForms)
+            {
+                forms.Add(form.IdOfFormNavigation);
+            }
+            return forms;
+        }
         public Class CreateClass(int id, List<Account> accounts, string className)
         {
             Class c = new Class() { ClassName = className, StaffMemberOfGroup = id, ClassYear = DateTime.Now.Year.ToString() };
             Classes.Add(c);
+            this.SaveChanges();
             foreach (Account a in accounts)
             {
                 ClientsInGroups.Add(new ClientsInGroup() { ClientId = a.Id, GroupId = c.GroupId });

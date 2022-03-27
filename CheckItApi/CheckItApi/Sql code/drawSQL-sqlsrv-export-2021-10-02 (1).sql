@@ -39,7 +39,7 @@ ALTER TABLE
     Forms ADD CONSTRAINT forms_formid_primary PRIMARY KEY(FormId);
 CREATE TABLE Organizations(
     SchoolId INT NOT NULL IDENTITY(1,1000),
-    ManagerId INT IDENTITY(1,1000),
+    ManagerId INT,
     OrganizationName NVARCHAR(255) NOT NULL,
     MashovSchoolId INT NOT NULL
 );

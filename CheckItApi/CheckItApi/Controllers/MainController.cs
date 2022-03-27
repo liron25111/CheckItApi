@@ -64,7 +64,7 @@ namespace CheckItApi.Controllers
                 //Check user name and password
                 if (user != null)
                 {
-                    HttpContext.Session.SetObject("theUser", user);
+                    HttpContext.Session.SetObject("staffMember", user);
 
                     Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
 
@@ -107,15 +107,48 @@ namespace CheckItApi.Controllers
             }
         }
 
+        [Route("ResetPassStaffMember")]
+        [HttpGet]
+        public StaffMember ResetPassStaffMember([FromQuery] string pass, [FromQuery] string Email)
+        {
+            StaffMember user = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+            StaffMember account = context.GetStaffMemberByEmail(Email);
+
+            if (user != null)
+            {
+                context.ChangePassStaffMember(user.Email, pass);
+                //EmailSender.SendEmail("Your Password Changed", $"Your New Password is {account.Pass} ", $"{ account.Email}", $"{ account.MemberName}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
+
+                return user;
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return null;
+            }
+        }
+
         [Route("ForgotPassword")]
         [HttpGet]
         public bool ForgotPassword([FromQuery] string Email)
         {
             bool succeed = false;
             Account account = context.GetAccountByEmail(Email);
+            StaffMember staffMember = context.GetStaffMemberByEmail(Email);
             if (account != null)
             {
                 EmailSender.SendEmail("Password Recovery", $"Your Password is {account.Pass} ", $"{ account.Email}", $"{ account.Username}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
+                succeed = true;
+            }
+            else if(staffMember != null)
+            {
+                EmailSender.SendEmail("Password Recovery", $"Your Password is {staffMember.Pass} ", $"{ staffMember.Email}", $"{ staffMember.MemberName}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
                 succeed = true;
             }
             return succeed;
@@ -153,6 +186,7 @@ namespace CheckItApi.Controllers
                 return false;
             }
         }
+        //צריך לעשות פעולה כזאת לstaffMember
         [Route("GetForms")]
         [HttpGet]
         public List<Form> GetForms([FromQuery] int clientId)
@@ -175,14 +209,36 @@ namespace CheckItApi.Controllers
                 return null;
             }
         }
+        [Route("GetFormsStaffMember")]
+        [HttpGet]
+        public List<Form> GetFormsStaffMember([FromQuery] int clientId)
+        {
+            StaffMember user = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+
+            if (user != null)
+            {
+                return context.GetFormsByStaffMember(clientId);
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return null;
+            }
+        }
 
         [Route("UploadExcel")]
         [HttpPost]
         public async Task<IActionResult> UploadExcel() // [FromBody] IFormFile file
         {
-            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
             IFormFile file = Request.Form.Files[0];
-            if (user != null || user == null)
+            if (staffMember != null)
             {
                 if (file == null)
                 {
@@ -252,8 +308,8 @@ namespace CheckItApi.Controllers
                         row++;
 
                     }
-
-                    Class g = context.CreateClass(1001, list, ws[1, 1].Value);
+                   
+                    Class g = context.CreateClass(staffMember.Id, list, ws[1, 1].Value);
 
 
                     //context.Entry(list[0]).State = Microsoft.EntityFrameworkCore.EntityState.Added;
@@ -336,7 +392,7 @@ namespace CheckItApi.Controllers
         [HttpGet]
         public List<Class> GetClasses()
         {
-            if (true || HttpContext.Session.GetObject<Account>("theUser") != null)
+            if ( HttpContext.Session.GetObject<Account>("theUser") != null || HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
                 return context.GetClasses();

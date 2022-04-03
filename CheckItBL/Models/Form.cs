@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckItBL.Models
 {
-    [Index(nameof(FormType), Name = "forms_formtype_index")]
+    [Table("Form")]
+    [Index(nameof(FormType), Name = "Form_formtype_index")]
     public partial class Form
     {
         public Form()
@@ -29,7 +30,8 @@ namespace CheckItBL.Models
         [Key]
         public int FormId { get; set; }
         public int GroupId { get; set; }
-        public TimeSpan Time { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime TripDate { get; set; }
 
         [ForeignKey(nameof(GroupId))]
         [InverseProperty(nameof(Class.Forms))]

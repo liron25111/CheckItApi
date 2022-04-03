@@ -114,5 +114,12 @@ namespace CheckItBL.Models
         {
             return this.Classes.ToList<Class>();
         }
+
+        public Form AddForm(Form f)
+        {
+            this.Forms.Add(f);
+            this.SaveChanges();
+            return f;
+        }
     }
 }

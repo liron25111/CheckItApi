@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckItBL.Models
 {
+    [Table("SignForm")]
     public partial class SignForm
     {
         [Key]

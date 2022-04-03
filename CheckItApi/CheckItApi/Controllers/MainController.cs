@@ -10,6 +10,9 @@ using CheckItApi.Services;
 using System.IO;
 using Spire.Xls;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace CheckItApi.Controllers
 {
@@ -399,6 +402,32 @@ namespace CheckItApi.Controllers
             }
             Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
             return null;
+        }
+
+        [Route("PostForms")]
+        [HttpGet]
+        public bool PostForm([FromQuery] string json)
+        {
+            List<Form> forms = JsonSerializer.Deserialize<List<Form>>(json);
+            if (forms != null && forms.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
+            {
+                bool worked = true;
+                foreach(Form f in forms)
+                {
+                    worked = context.AddForm(f) != null;
+                }
+                
+                if (worked)
+                {
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                    return true;
+                }
+                else
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+            }
+            else
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return false;
         }
 
     }

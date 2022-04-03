@@ -24,19 +24,19 @@ ALTER TABLE
     StaffMember ADD CONSTRAINT staffmember_id_primary PRIMARY KEY(id);
 CREATE UNIQUE INDEX staffmember_email_unique ON
     StaffMember(Email);
-CREATE TABLE Forms(
+CREATE TABLE Form(
     FormType NVARCHAR(255) NULL,
     topic NVARCHAR(255) NOT NULL,
     massageBody NVARCHAR(255) NULL,
     StatusOfTheMessage INT NOT NULL,
     FormId INT NOT NULL IDENTITY(1,10000),
     GroupId INT NOT NULL,
-    Time TIME NOT NULL
+    TripDate DATETIME NOT NULL
 );
-CREATE INDEX forms_formtype_index ON
-    Forms(FormType);
+CREATE INDEX Form_formtype_index ON
+    Form(FormType);
 ALTER TABLE
-    Forms ADD CONSTRAINT forms_formid_primary PRIMARY KEY(FormId);
+    Form ADD CONSTRAINT Form_formid_primary PRIMARY KEY(FormId);
 CREATE TABLE Organizations(
     SchoolId INT NOT NULL IDENTITY(1,1000),
     ManagerId INT,
@@ -59,13 +59,13 @@ CREATE TABLE ClientsInGroup(
 );
 ALTER TABLE
     ClientsInGroup ADD CONSTRAINT clientsingroup_clientid_primary PRIMARY KEY(ClientId,GroupId);
-CREATE TABLE SignForms(
+CREATE TABLE SignForm(
     IdOfForm INT NOT NULL,
     Account INT NOT NULL,
     SignatureTime TIME NOT NULL
 );
 ALTER TABLE
-    SignForms ADD CONSTRAINT signforms_idofform_primary PRIMARY KEY(IdOfForm,Account);
+    SignForm ADD CONSTRAINT signForm_idofform_primary PRIMARY KEY(IdOfForm,Account);
 CREATE TABLE Students(
     id INT NOT NULL,
     Name NVARCHAR(255) NOT NULL
@@ -84,13 +84,13 @@ ALTER TABLE
 ALTER TABLE
     StaffMember ADD CONSTRAINT staffmember_schoolid_foreign FOREIGN KEY(SchoolId) REFERENCES Organizations(SchoolId);
 ALTER TABLE
-    Forms ADD CONSTRAINT forms_groupid_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
+    Form ADD CONSTRAINT Form_groupid_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
 ALTER TABLE
     Students ADD CONSTRAINT students_Id_foreign FOREIGN KEY(Id) REFERENCES Account(Id);
 ALTER TABLE
     AccountOrganizations ADD CONSTRAINT account_Id_foreign FOREIGN KEY(AccountId) REFERENCES Account(Id);
 ALTER TABLE
-    SignForms ADD CONSTRAINT account_Idform_foreign FOREIGN KEY(Account) REFERENCES Account(Id);
+    SignForm ADD CONSTRAINT account_Idform_foreign FOREIGN KEY(Account) REFERENCES Account(Id);
 ALTER TABLE
     ClientsInGroup ADD CONSTRAINT ClientsInGroup_ClientId_foreign FOREIGN KEY(ClientId) REFERENCES Students(id);
 ALTER TABLE
@@ -99,7 +99,7 @@ ALTER TABLE
 ALTER TABLE
     AccountOrganizations ADD CONSTRAINT AccountOrganizations_OrganizationId_foreign FOREIGN KEY(OrganizationId) REFERENCES Organizations(SchoolId);
 ALTER TABLE
-    SignForms ADD CONSTRAINT SignForms_IdOfForm_foreign FOREIGN KEY(IdOfForm) REFERENCES Forms(FormId);
+    SignForm ADD CONSTRAINT SignForm_IdOfForm_foreign FOREIGN KEY(IdOfForm) REFERENCES Form(FormId);
 
 ALTER TABLE
     Organizations ADD CONSTRAINT Organizations_ManagerId_foreign FOREIGN KEY(ManagerId) REFERENCES StaffMember(id);

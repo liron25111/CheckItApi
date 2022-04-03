@@ -38,7 +38,7 @@ namespace CheckItBL.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Relational:Collation", "Hebrew_CI_AS");
+            modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
             modelBuilder.Entity<AccountOrganization>(entity =>
             {
@@ -94,7 +94,7 @@ namespace CheckItBL.Models
                     .WithMany(p => p.Forms)
                     .HasForeignKey(d => d.GroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("forms_groupid_foreign");
+                    .HasConstraintName("Form_groupid_foreign");
             });
 
             modelBuilder.Entity<Organization>(entity =>
@@ -111,7 +111,7 @@ namespace CheckItBL.Models
             modelBuilder.Entity<SignForm>(entity =>
             {
                 entity.HasKey(e => new { e.IdOfForm, e.Account })
-                    .HasName("signforms_idofform_primary");
+                    .HasName("signForm_idofform_primary");
 
                 entity.HasOne(d => d.AccountNavigation)
                     .WithMany(p => p.SignForms)
@@ -123,7 +123,7 @@ namespace CheckItBL.Models
                     .WithMany(p => p.SignForms)
                     .HasForeignKey(d => d.IdOfForm)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("SignForms_IdOfForm_foreign");
+                    .HasConstraintName("SignForm_IdOfForm_foreign");
             });
 
             modelBuilder.Entity<StaffMember>(entity =>

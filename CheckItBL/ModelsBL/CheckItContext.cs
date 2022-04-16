@@ -75,22 +75,32 @@ namespace CheckItBL.Models
 
         public List<Form> GetFormsByAccount(int id)
         {
-            List<SignForm> signForms = SignForms.Where(s => s.AccountNavigation.Id == id).ToList<SignForm>();
-            List<Form> forms = new List<Form>();
-            foreach (SignForm form in signForms)
+            List<int> classIds = this.ClientsInGroups.Where(x => x.ClientId == id).Select(s => s.GroupId).ToList();
+            List<int> formIds = new List<int>();
+            foreach(int i in classIds)
             {
-                forms.Add(form.IdOfFormNavigation);
+                List<int> current = this.GroupsInForms.Where(x => x.GroupId == i).Select(s => s.FormId).ToList();
+                foreach(int formId in current)
+                {
+                    formIds.Add(formId);
+                }
             }
-            return forms;
+            List<Form> forms = new List<Form>();
+            foreach(int i in formIds)
+                    forms.Add(this.Forms.FirstOrDefault(x => x.FormId == i));
+            return new List<Form>(new HashSet<Form>(forms));
         }
         public List<Form> GetFormsByStaffMember(int id)
         {
-            List<SignForm> signForms = SignForms.Where(s => s.IdOfFormNavigation.Group.StaffMemberOfGroup == id).ToList<SignForm>();
-            List<Form> forms = new List<Form>();
-            foreach (SignForm form in signForms)
-            {
-                forms.Add(form.IdOfFormNavigation);
-            }
+            //List<SignForm> signForms = SignForms.Where(s => s.IdOfFormNavigation.Group.StaffMemberOfGroup == id).ToList<SignForm>();
+            //List<Form> forms = new List<Form>();
+            //foreach (SignForm form in signForms)
+            //{
+            //    forms.Add(form.IdOfFormNavigation);
+            //}
+            //return forms;
+
+            List<Form> forms = this.Forms.Where(x => x.SentByStaffMemebr == id).ToList();
             return forms;
         }
         public Class CreateClass(int id, List<Account> accounts, string className)
@@ -120,6 +130,26 @@ namespace CheckItBL.Models
             this.Forms.Add(f);
             this.SaveChanges();
             return f;
+        }
+
+        public bool PostForm(Form f, List<int> ids)
+        {
+            try
+            {
+                Form form = this.AddForm(f);
+                foreach (int i in ids)
+                {
+                    this.GroupsInForms.Add(new GroupsInForm() { GroupId = i, FormId = form.FormId });
+                }
+                this.SaveChanges();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
+
         }
     }
 }

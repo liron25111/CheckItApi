@@ -30,8 +30,9 @@ CREATE TABLE Form(
     massageBody NVARCHAR(255) NULL,
     StatusOfTheMessage INT NOT NULL,
     FormId INT NOT NULL IDENTITY(1,10000),
-    GroupId INT NOT NULL,
-    TripDate DATETIME NOT NULL
+--    GroupId INT NOT NULL,
+    TripDate DATETIME NOT NULL,
+    SentByStaffMemebr INT NOT NULL
 );
 CREATE INDEX Form_formtype_index ON
     Form(FormType);
@@ -79,12 +80,18 @@ CREATE TABLE AccountOrganizations(
 ALTER TABLE
     AccountOrganizations ADD CONSTRAINT accountorganizations_accountid_primary PRIMARY KEY(AccountId,OrganizationId);
 
+CREATE TABLE GroupsInForm(
+    GroupId INT NOT NULL,
+    FormId INT NOT NULL
+);
+ALTER TABLE
+    GroupsInForm ADD CONSTRAINT groupsInForm_primary PRIMARY KEY(GroupId,FormId);
 ALTER TABLE
     Class ADD CONSTRAINT group_staffmemberofgroup_foreign FOREIGN KEY(StaffMemberOfGroup) REFERENCES StaffMember(id);
 ALTER TABLE
     StaffMember ADD CONSTRAINT staffmember_schoolid_foreign FOREIGN KEY(SchoolId) REFERENCES Organizations(SchoolId);
-ALTER TABLE
-    Form ADD CONSTRAINT Form_groupid_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
+--ALTER TABLE
+--    Form ADD CONSTRAINT Form_groupid_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
 ALTER TABLE
     Students ADD CONSTRAINT students_Id_foreign FOREIGN KEY(Id) REFERENCES Account(Id);
 ALTER TABLE
@@ -104,7 +111,14 @@ ALTER TABLE
 ALTER TABLE
     Organizations ADD CONSTRAINT Organizations_ManagerId_foreign FOREIGN KEY(ManagerId) REFERENCES StaffMember(id);
 
+ALTER TABLE
+    Form ADD CONSTRAINT Form_SentByStaffMember FOREIGN KEY(SentByStaffMemebr) REFERENCES StaffMember(id);
 
+ALTER TABLE
+    GroupsInForm ADD CONSTRAINT GroupId_foreign FOREIGN KEY(GroupId) REFERENCES Class(GroupId);
+
+ALTER TABLE
+    GroupsInForm ADD CONSTRAINT FormId_foreign FOREIGN KEY(FormId) REFERENCES Form(FormId);
 
 
 

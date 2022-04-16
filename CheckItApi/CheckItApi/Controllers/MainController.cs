@@ -195,8 +195,9 @@ namespace CheckItApi.Controllers
         public List<Form> GetForms([FromQuery] int clientId)
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
             //Check if user logged in and its ID is the same as the contact user ID
-            if (user == null)
+            if (user == null && staffMember == null)
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
                 return null;
@@ -205,6 +206,10 @@ namespace CheckItApi.Controllers
             if (user != null)
             {
                 return context.GetFormsByAccount(clientId);
+            }
+            else if (staffMember != null)
+            {
+                return context.GetFormsByStaffMember(clientId);
             }
             else
             {
@@ -406,17 +411,13 @@ namespace CheckItApi.Controllers
 
         [Route("PostForms")]
         [HttpGet]
-        public bool PostForm([FromQuery] string json)
+        public bool PostForm([FromQuery] string formJson, [FromQuery] string classesJson)
         {
-            List<Form> forms = JsonSerializer.Deserialize<List<Form>>(json);
-            if (forms != null && forms.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
-            {
-                bool worked = true;
-                foreach(Form f in forms)
-                {
-                    worked = context.AddForm(f) != null;
-                }
-                
+            Form form = JsonSerializer.Deserialize<Form>(formJson);
+            List<int> classes = JsonSerializer.Deserialize<List<int>>(classesJson);
+            if (form != null && classes.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
+            {               
+                bool worked = context.PostForm(form, classes);
                 if (worked)
                 {
                     Response.StatusCode = (int)System.Net.HttpStatusCode.OK;

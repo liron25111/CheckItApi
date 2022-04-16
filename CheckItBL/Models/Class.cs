@@ -14,7 +14,7 @@ namespace CheckItBL.Models
         public Class()
         {
             ClientsInGroups = new HashSet<ClientsInGroup>();
-            Forms = new HashSet<Form>();
+            GroupsInForms = new HashSet<GroupsInForm>();
         }
 
         [Required]
@@ -32,7 +32,7 @@ namespace CheckItBL.Models
         public virtual StaffMember StaffMemberOfGroupNavigation { get; set; }
         [InverseProperty(nameof(ClientsInGroup.Group))]
         public virtual ICollection<ClientsInGroup> ClientsInGroups { get; set; }
-        [InverseProperty(nameof(Form.Group))]
-        public virtual ICollection<Form> Forms { get; set; }
+        [InverseProperty(nameof(GroupsInForm.Group))]
+        public virtual ICollection<GroupsInForm> GroupsInForms { get; set; }
     }
 }

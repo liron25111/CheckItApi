@@ -22,6 +22,7 @@ namespace CheckItBL.Models
         public virtual DbSet<Class> Classes { get; set; }
         public virtual DbSet<ClientsInGroup> ClientsInGroups { get; set; }
         public virtual DbSet<Form> Forms { get; set; }
+        public virtual DbSet<GroupsInForm> GroupsInForms { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<SignForm> SignForms { get; set; }
         public virtual DbSet<StaffMember> StaffMembers { get; set; }
@@ -90,11 +91,29 @@ namespace CheckItBL.Models
 
             modelBuilder.Entity<Form>(entity =>
             {
-                entity.HasOne(d => d.Group)
+                entity.HasOne(d => d.SentByStaffMemebrNavigation)
                     .WithMany(p => p.Forms)
+                    .HasForeignKey(d => d.SentByStaffMemebr)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Form_SentByStaffMember");
+            });
+
+            modelBuilder.Entity<GroupsInForm>(entity =>
+            {
+                entity.HasKey(e => new { e.GroupId, e.FormId })
+                    .HasName("groupsInForm_primary");
+
+                entity.HasOne(d => d.Form)
+                    .WithMany(p => p.GroupsInForms)
+                    .HasForeignKey(d => d.FormId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FormId_foreign");
+
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.GroupsInForms)
                     .HasForeignKey(d => d.GroupId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Form_groupid_foreign");
+                    .HasConstraintName("GroupId_foreign");
             });
 
             modelBuilder.Entity<Organization>(entity =>

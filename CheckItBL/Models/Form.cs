@@ -14,6 +14,7 @@ namespace CheckItBL.Models
     {
         public Form()
         {
+            GroupsInForms = new HashSet<GroupsInForm>();
             SignForms = new HashSet<SignForm>();
         }
 
@@ -29,13 +30,15 @@ namespace CheckItBL.Models
         public int StatusOfTheMessage { get; set; }
         [Key]
         public int FormId { get; set; }
-        public int GroupId { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime TripDate { get; set; }
+        public int SentByStaffMemebr { get; set; }
 
-        [ForeignKey(nameof(GroupId))]
-        [InverseProperty(nameof(Class.Forms))]
-        public virtual Class Group { get; set; }
+        [ForeignKey(nameof(SentByStaffMemebr))]
+        [InverseProperty(nameof(StaffMember.Forms))]
+        public virtual StaffMember SentByStaffMemebrNavigation { get; set; }
+        [InverseProperty(nameof(GroupsInForm.Form))]
+        public virtual ICollection<GroupsInForm> GroupsInForms { get; set; }
         [InverseProperty(nameof(SignForm.IdOfFormNavigation))]
         public virtual ICollection<SignForm> SignForms { get; set; }
     }

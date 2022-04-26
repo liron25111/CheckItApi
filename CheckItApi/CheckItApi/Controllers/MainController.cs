@@ -58,32 +58,32 @@ namespace CheckItApi.Controllers
         }
 
 
-            [Route("Login2")]
-            [HttpGet]
-            public StaffMember Login2([FromQuery] string email, [FromQuery] string pass)
-            {
+        [Route("Login2")]
+        [HttpGet]
+        public StaffMember Login2([FromQuery] string email, [FromQuery] string pass)
+        {
             StaffMember user = context.Login2(email, pass);
 
-                //Check user name and password
-                if (user != null)
-                {
-                    HttpContext.Session.SetObject("staffMember", user);
+            //Check user name and password
+            if (user != null)
+            {
+                HttpContext.Session.SetObject("staffMember", user);
 
-                    Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
 
-                    //Important! Due to the Lazy Loading, the user will be returned with all of its contects!!
-                    return user;
-                }
-                else
-                {
-
-                    Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-                    return null;
-                }
+                //Important! Due to the Lazy Loading, the user will be returned with all of its contects!!
+                return user;
             }
+            else
+            {
+
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return null;
+            }
+        }
 
 
-            [Route("ResetPass")]
+        [Route("ResetPass")]
         [HttpGet]
         public Account ResetPass([FromQuery] string pass, [FromQuery] string Email)
         {
@@ -149,7 +149,7 @@ namespace CheckItApi.Controllers
                 EmailSender.SendEmail("Password Recovery", $"Your Password is {account.Pass} ", $"{ account.Email}", $"{ account.Username}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
                 succeed = true;
             }
-            else if(staffMember != null)
+            else if (staffMember != null)
             {
                 EmailSender.SendEmail("Password Recovery", $"Your Password is {staffMember.Pass} ", $"{ staffMember.Email}", $"{ staffMember.MemberName}", "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
                 succeed = true;
@@ -160,7 +160,7 @@ namespace CheckItApi.Controllers
         [HttpGet]
         public int Signs([FromQuery] int formId)
         {
-            if(context.GetForm(formId) == null)
+            if (context.GetForm(formId) == null)
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
                 return 0;
@@ -181,7 +181,7 @@ namespace CheckItApi.Controllers
 
             if (user != null)
             {
-                return context.IsSigned(Email,formId);
+                return context.IsSigned(Email, formId);
             }
             else
             {
@@ -305,7 +305,7 @@ namespace CheckItApi.Controllers
                         else
                         {
                             Student student = context.GetStudent(a.Id);
-                            if(student == null)
+                            if (student == null)
                             {
                                 student = new Student() { Id = a.Id, Name = ws[row, 3].Value + " " + ws[row, 4].Value };
                                 context.AddStudent(student);
@@ -316,7 +316,7 @@ namespace CheckItApi.Controllers
                         row++;
 
                     }
-                   
+
                     Class g = context.CreateClass(staffMember.Id, list, ws[1, 1].Value);
 
 
@@ -336,33 +336,33 @@ namespace CheckItApi.Controllers
         }
         [Route("uploadFile")]
         [HttpPost]
-        public async Task<IActionResult> UploadFile([FromBody]  IFormFile file) // [FromBody] IFormFile file
+        public async Task<IActionResult> UploadFile([FromBody] IFormFile file) // [FromBody] IFormFile file
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
             if (user != null)
+            {
+                if (file == null)
                 {
-                    if (file == null)
+                    return BadRequest();
+                }
+
+                try
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Files", file.FileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
                     {
-                        return BadRequest();
+                        await file.CopyToAsync(stream);
                     }
 
-                    try
+                    Workbook wb = new Workbook();
+                    wb.LoadFromFile("test.xlsx");
+                    Worksheet ws = wb.Worksheets[0];
+
+                    List<Account> list = new List<Account>();
+                    int row = 4;
+
+                    while (!string.IsNullOrEmpty(ws[row, 1].Value))
                     {
-                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Files", file.FileName);
-                        using (var stream = new FileStream(path, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
-
-                        Workbook wb = new Workbook();
-                        wb.LoadFromFile("test.xlsx");
-                        Worksheet ws = wb.Worksheets[0];
-
-                        List<Account> list = new List<Account>();
-                        int row = 4;
-
-                        while (!string.IsNullOrEmpty(ws[row, 1].Value))
-                        {
                         Account a = context.GetAccount(ws[row, 14].Value);
                         if (a == null)
                         {
@@ -378,29 +378,29 @@ namespace CheckItApi.Controllers
                             Student s = new Student() { Id = a.Id, Name = ws[row, 3].Value + " " + ws[row, 4].Value };
                             context.AddStudent(s);
                         }
-                            list.Add(a);
-                            row++;
-                        
-                        }
+                        list.Add(a);
+                        row++;
 
-                        Class g = context.CreateClass(user.Id, list,ws[1,1].Value);
+                    }
 
-                        return Ok(new { length = file.Length, name = file.FileName });
+                    Class g = context.CreateClass(user.Id, list, ws[1, 1].Value);
+
+                    return Ok(new { length = file.Length, name = file.FileName });
 
                 }
                 catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        return BadRequest();
-                    }
+                {
+                    Console.WriteLine(e.Message);
+                    return BadRequest();
                 }
+            }
             return Forbid();
         }
         [Route("GetClasses")]
         [HttpGet]
         public List<Class> GetClasses()
         {
-            if ( HttpContext.Session.GetObject<Account>("theUser") != null || HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
+            if (HttpContext.Session.GetObject<Account>("theUser") != null || HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
             {
                 Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
                 return context.GetClasses();
@@ -416,7 +416,7 @@ namespace CheckItApi.Controllers
             Form form = JsonSerializer.Deserialize<Form>(formJson);
             List<int> classes = JsonSerializer.Deserialize<List<int>>(classesJson);
             if (form != null && classes.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
-            {               
+            {
                 bool worked = context.PostForm(form, classes);
                 if (worked)
                 {
@@ -429,6 +429,29 @@ namespace CheckItApi.Controllers
             else
                 Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
             return false;
+        }
+
+        [Route("GetFormGroups")]
+        [HttpGet]
+        public List<Class> GetFormGroups([FromQuery] int formId)
+        {
+            try
+            {
+                List<Class> f = context.GetFormGroups(formId);
+                if(f != null && f.Count > 0)
+                {
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                    return f;
+                }
+                else
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+            }
+            catch
+            {
+
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+            }
+            return null;
         }
 
     }

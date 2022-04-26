@@ -17,7 +17,7 @@ INSERT INTO Class (ClassName, StaffMemberOfGroup, ClassYear) Values ('Web Servic
 
 INSERT INTO Class (ClassName, StaffMemberOfGroup, ClassYear) Values ('Homeroom', 1, '2020');
 
-INSERT INTO Student (id, [Name]) Values (1, 'Liron');
+INSERT INTO Students (id, [Name]) Values (1, 'Liron');
 INSERT INTO ClientsInGroup (GroupId, ClientId) Values (1,1);
 INSERT INTO ClientsInGroup (GroupId, ClientId) Values (1001,1);
 INSERT INTO ClientsInGroup (GroupId, ClientId) Values (2001,1);

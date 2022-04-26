@@ -151,5 +151,52 @@ namespace CheckItBL.Models
 
 
         }
+
+        public List<Class> GetFormGroups(int formId)
+        {
+            List<Class> groups = this.GroupsInForms.Where(x => x.FormId == formId).Select(s => s.Group).ToList();
+            return groups;
+        }
+
+        public List<Class> GetMyGroupsStudent(int id)
+        {
+            List<Class> groups = this.ClientsInGroups.Where(x => x.ClientId == id).Select(x => x.Group).ToList();
+            return groups;
+        }
+        public List<Student> GetAccountsFromGroup(int classId)
+        {
+            List<Student> accounts = this.ClientsInGroups.Where(x => x.GroupId == classId).Select(a => a.Client).ToList();
+            return accounts;
+        }
+        public List<Class> GetMyGroupsStaff(int staffId)
+        {
+            List<Class> classes = this.Classes.Where(x => x.StaffMemberOfGroup == staffId).ToList();
+            return classes;
+        }
+
+        public List<Account> GetAccountsSigned(int formId)
+        {
+            List<Account> accounts = this.SignForms.Where(x => x.IdOfForm == formId).Select(a => a.AccountNavigation).ToList();
+            return accounts;
+        }
+        public List<Account> GetWhoDidntSign(int formId)
+        {
+            List<Class> gif = this.GroupsInForms.Where(x => x.FormId == formId).Select(a => a.Group).ToList();
+            List<Account> assigned = new List<Account>();
+            foreach(Class c in gif)
+            {
+                List<Student> accounts = c.ClientsInGroups.Select(x => x.Client).ToList();
+                foreach (Student s in accounts)
+                    assigned.Add(this.Accounts.FirstOrDefault(w => w.Id == s.Id));
+            }
+            List<Account> signed = this.GetAccountsSigned(formId);
+            List<Account> didntSign = new List<Account>();
+            foreach (Account acc in assigned)
+            {
+                if(!signed.Contains(acc))
+                    didntSign.Add(acc);
+            }
+            return didntSign;
+        }
     }
 }

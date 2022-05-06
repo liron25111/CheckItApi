@@ -189,6 +189,47 @@ namespace CheckItApi.Controllers
                 return false;
             }
         }
+        [Route("CheckIfSigned")]
+        [HttpGet]
+        public bool CheckIfSigned([FromQuery] int formId, [FromQuery] int clientid)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return false;
+            }
+
+            if (user != null)
+            {
+                 context.FormSigned(clientid, formId);
+                return true;
+            }
+            else
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return false;
+            }
+        }
+        [Route("LogOut")]
+        [HttpGet]
+        public bool LogOut()
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            if (user == null && staffMember == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return false;
+            }
+            HttpContext.Session.SetObject("staffMember", null);
+            HttpContext.Session.SetObject("theUser", null);
+            return true;
+
+
+        }
+
         //צריך לעשות פעולה כזאת לstaffMember
         [Route("GetForms")]
         [HttpGet]
@@ -453,8 +494,49 @@ namespace CheckItApi.Controllers
             }
             return null;
         }
+        [Route("GetGroupsOfStudent")]
+        [HttpGet]
+        public List<Class> GetGroupsOfStudent([FromQuery] int clientId)
+        {
+            if (HttpContext.Session.GetObject<Account>("theUser") != null )
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                return context.GetMyGroupsStudent(clientId);
+            }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
+        }
 
+        [Route("GetGroupsOfStaff")]
+        [HttpGet]
+        public List<Class> GetGroupsOfStaff([FromQuery] int staffMemberId)
+        {
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            if (staffMember != null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                List<Class> group = context.GetMyGroupsStaff(staffMemberId);
+                return group;
+            }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
+        }
+
+        [Route("GetAccountsFromGroup")]
+        [HttpGet]
+        public List<Student> GetAccountsFromGroup([FromQuery] int Classid)
+        {
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            if (staffMember != null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+                return context.GetAccountsFromGroup(Classid);
+            }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
+        }
     }
 
+    
 }
 

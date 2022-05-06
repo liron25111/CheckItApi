@@ -29,6 +29,11 @@ namespace CheckItBL.Models
         {
             return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId) != null;
         }
+        public void FormSigned(int clientid, int formid)
+        {
+            this.SignForms.Add(new SignForm() { IdOfForm = formid, Account =  clientid, SignatureTime = DateTime.Now.TimeOfDay  });
+            this.SaveChanges();
+        }
         public Account GetAccount(string email) => Accounts.Where(a => a.Email == email).FirstOrDefault();
         public void AddAccount(Account a)
         {
@@ -37,7 +42,27 @@ namespace CheckItBL.Models
         }
         public int Signs(int formId)
         {
-            return this.SignForms.Count(s => s.IdOfFormNavigation.FormId == formId);
+            int num =  this.SignForms.Count(s => s.IdOfForm == formId);
+            return num;
+        }
+        public List<Student> GetStudentsInForm(int formId)
+        {
+            List<GroupsInForm> groupsInForms = Forms.Where(f => f.FormId == formId).First().GroupsInForms.ToList<GroupsInForm>();
+            List<Class> classes = new List<Class>();
+            foreach(GroupsInForm g in groupsInForms)
+            {
+                classes.Add(g.Group);
+            }
+            List<Student> students = new List<Student>();
+            foreach(Class c in classes)
+            {
+                foreach(ClientsInGroup cg in c.ClientsInGroups)
+                {
+                    students.Add(cg.Client);
+                }
+            }
+            return students;
+           
         }
         public Form GetForm(int formId)
         {
@@ -84,6 +109,11 @@ namespace CheckItBL.Models
                 {
                     formIds.Add(formId);
                 }
+            }
+            List<int> formSignedIds = this.SignForms.Where(x => x.Account == id).Select(s => s.IdOfForm).ToList();
+            foreach(int i in formSignedIds)
+            {
+                formIds.Remove(i);
             }
             List<Form> forms = new List<Form>();
             foreach(int i in formIds)

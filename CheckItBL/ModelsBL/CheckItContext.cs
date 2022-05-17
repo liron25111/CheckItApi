@@ -27,7 +27,11 @@ namespace CheckItBL.Models
 
         public bool IsSigned(string email, int formId)
         {
-            return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId) != null;
+            return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId).FirstOrDefault() != null;
+        }
+        public bool IsSigned(int studentId, int formId)
+        {
+            return this.SignForms.Where(s => s.Account== studentId && s.IdOfFormNavigation.FormId == formId).FirstOrDefault() != null;
         }
         public void FormSigned(int clientid, int formid)
         {
@@ -45,7 +49,7 @@ namespace CheckItBL.Models
             int num =  this.SignForms.Count(s => s.IdOfForm == formId);
             return num;
         }
-        public List<Student> GetStudentsInForm(int formId)
+        public List<Tuple<Student,bool>> GetSignedStudentsInForm(int formId)
         {
             List<GroupsInForm> groupsInForms = Forms.Where(f => f.FormId == formId).First().GroupsInForms.ToList<GroupsInForm>();
             List<Class> classes = new List<Class>();
@@ -53,16 +57,38 @@ namespace CheckItBL.Models
             {
                 classes.Add(g.Group);
             }
-            List<Student> students = new List<Student>();
+            List<int> studentsIds = new List<int>();
             foreach(Class c in classes)
             {
                 foreach(ClientsInGroup cg in c.ClientsInGroups)
                 {
-                    students.Add(cg.Client);
+                    if(studentsIds.Count(i => i == cg.ClientId) == 0)
+                    studentsIds.Add(cg.ClientId);
                 }
             }
-            return students;
+            List<Tuple<Student,bool>> studentsSigned = new List<Tuple<Student, bool>>();
+            foreach(int i in studentsIds)
+            {
+                Student s = GetStudent(i);
+                bool b = IsSigned(i, formId);
+                Tuple<Student, bool> t = new Tuple<Student, bool>(s,b);
+                studentsSigned.Add(t);
+            }
+            return studentsSigned;
            
+        }
+        //public Student GetStudent(int id)
+        //{
+        //    return Students.Where(s => s.Id == id).FirstOrDefault();
+        //}
+        public List<Student> GetStudentsInGroup(int groupId)
+        {
+            return this.ClientsInGroups.Where(g => g.GroupId == groupId).Select(cg => cg.Client).ToList();
+
+        }
+        public bool IsGroupExist(int groupId)
+        {
+            return Classes.Count(c => c.GroupId == groupId) > 0;
         }
         public Form GetForm(int formId)
         {

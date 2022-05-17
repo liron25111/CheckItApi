@@ -280,7 +280,43 @@ namespace CheckItApi.Controllers
                 return null;
             }
         }
+        [Route("GetStudentsInGroup")]
+        [HttpGet]
+        public List<Student> GetStudentsInGroup([FromQuery] int groupId)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null && staffMember == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+            if (context.IsGroupExist(groupId))
+                return context.GetStudentsInGroup(groupId);
 
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
+
+        }
+        [Route("GetSignedStudentsInForm")]
+        [HttpGet]
+        public List<Tuple<Student,bool>> GetSignedStudentsInForm([FromQuery] int formId)
+        {
+            Account user = HttpContext.Session.GetObject<Account>("theUser");
+            StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            //Check if user logged in and its ID is the same as the contact user ID
+            if (user == null && staffMember == null)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                return null;
+            }
+            if (context.GetForm(formId) != null)
+                return context.GetSignedStudentsInForm(formId);
+
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return null;
+        }
         [Route("UploadExcel")]
         [HttpPost]
         public async Task<IActionResult> UploadExcel() // [FromBody] IFormFile file

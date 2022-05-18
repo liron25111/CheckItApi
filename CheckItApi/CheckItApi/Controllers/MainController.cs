@@ -509,12 +509,29 @@ namespace CheckItApi.Controllers
         public bool PostForm([FromQuery] string formJson, [FromQuery] string classesJson)
         {
             Form form = System.Text.Json.JsonSerializer.Deserialize<Form>(formJson);
-            List<int> classes = System.Text.Json.JsonSerializer.Deserialize<List<int>>(classesJson);
-            if (form != null && classes.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
+            List<int> classesIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(classesJson);
+            if (form != null && classesIds.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
             {
-                bool worked = context.PostForm(form, classes);
+                bool worked = context.PostForm(form, classesIds);
                 if (worked)
                 {
+                    List<Class> classes = context.GetClasses(classesIds);
+                    List<int> studentIds = new List<int>();
+                    foreach (Class c in classes)
+                    {
+                        List<Student> studentsInClass = context.GetStudentsInGroup(c.GroupId);
+                        foreach (Student s in studentsInClass)
+                        {
+                            if (!studentIds.Contains(s.Id))
+                                studentIds.Add(s.Id);
+                        }
+                    }
+                    List<Student> students = context.GetStudents(studentIds);
+                    foreach(Student s in students)
+                    {
+                        EmailSender.SendEmail("New Form", $"You Have new Form To Sign: {form.Topic}", context.GetAccount(s.Id).Email, s.Name, "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
+
+                    }
                     Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
                     return true;
                 }

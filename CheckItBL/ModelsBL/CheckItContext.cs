@@ -25,7 +25,22 @@ namespace CheckItBL.Models
 
             return user;
         }
-
+        public Account GetAccount(int id)
+        {
+            return Accounts.Where(a => a.Id == id).FirstOrDefault();
+        }
+        public List<Class> GetClasses(List<int> classesIds)
+        {
+            return classesIds.Select(id => GetClass(id)).ToList<Class>();
+        }
+        public List<Student> GetStudents(List<int> studentIds)
+        {
+            return studentIds.Select(id => GetStudent(id)).ToList<Student>();
+        }
+        public Class GetClass(int id)
+        {
+            return Classes.Where(c => c.GroupId == id).FirstOrDefault();
+        }
         public bool IsSigned(string email, int formId)
         {
             return this.SignForms.Where(s => s.AccountNavigation.Email == email && s.IdOfFormNavigation.FormId == formId).FirstOrDefault() != null;

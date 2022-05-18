@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
+
 namespace CheckItBL.Models
 {
     partial class CheckItContext
@@ -51,7 +52,7 @@ namespace CheckItBL.Models
         }
         public List<Tuple<Student,bool>> GetSignedStudentsInForm(int formId)
         {
-            List<GroupsInForm> groupsInForms = Forms.Where(f => f.FormId == formId).First().GroupsInForms.ToList<GroupsInForm>();
+            List<GroupsInForm> groupsInForms = GroupsInForms.Where(g => g.FormId == formId).Include(groupInForm => groupInForm.Group.ClientsInGroups).ToList<GroupsInForm>();
             List<Class> classes = new List<Class>();
             foreach(GroupsInForm g in groupsInForms)
             {

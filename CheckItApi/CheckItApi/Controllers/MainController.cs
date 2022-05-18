@@ -3,14 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using CheckItBL.Models;
 using CheckItApi.DTO;
 using CheckItApi.Services;
 using System.IO;
 using Spire.Xls;
+using Newtonsoft.Json;
 using System.Text;
-using System.Text.Json;
+using System.IO;
+
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
@@ -301,7 +305,7 @@ namespace CheckItApi.Controllers
         }
         [Route("GetSignedStudentsInForm")]
         [HttpGet]
-        public List<Tuple<Student,bool>> GetSignedStudentsInForm([FromQuery] int formId)
+        public string GetSignedStudentsInForm([FromQuery] int formId)
         {
             Account user = HttpContext.Session.GetObject<Account>("theUser");
             StaffMember staffMember = HttpContext.Session.GetObject<StaffMember>("staffMember");
@@ -312,7 +316,21 @@ namespace CheckItApi.Controllers
                 return null;
             }
             if (context.GetForm(formId) != null)
-                return context.GetSignedStudentsInForm(formId);
+            {
+                List<Tuple<Student, bool>> list = context.GetSignedStudentsInForm(formId);
+                List<StudentSignDTO> studentSignDTOs = new List<StudentSignDTO>();
+                foreach (Tuple<Student, bool> t in list)
+                {
+                    studentSignDTOs.Add(new StudentSignDTO(t.Item1, t.Item2));
+                }
+                JsonSerializerSettings options = new JsonSerializerSettings
+                {
+                    PreserveReferencesHandling = PreserveReferencesHandling.All
+                };
+
+                string json = JsonConvert.SerializeObject(studentSignDTOs, options);
+                return json;
+            }
 
             Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
             return null;
@@ -490,8 +508,8 @@ namespace CheckItApi.Controllers
         [HttpGet]
         public bool PostForm([FromQuery] string formJson, [FromQuery] string classesJson)
         {
-            Form form = JsonSerializer.Deserialize<Form>(formJson);
-            List<int> classes = JsonSerializer.Deserialize<List<int>>(classesJson);
+            Form form = System.Text.Json.JsonSerializer.Deserialize<Form>(formJson);
+            List<int> classes = System.Text.Json.JsonSerializer.Deserialize<List<int>>(classesJson);
             if (form != null && classes.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
             {
                 bool worked = context.PostForm(form, classes);

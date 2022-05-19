@@ -61,7 +61,36 @@ namespace CheckItApi.Controllers
             }
         }
 
+        [Route("Alert")]
+        [HttpGet]
+        public bool Alert([FromQuery] int formId)
+        {
+            StaffMember user = HttpContext.Session.GetObject<StaffMember>("staffMember");
+            if(user != null)
+            {
+                Form f = context.GetForm(formId);
+                if(f != null)
+                {
+                    List<Tuple<Student, bool>> tuples = context.GetSignedStudentsInForm(formId);
+                    foreach(Tuple<Student, bool> tuple in tuples)
+                    {
+                        if (!tuple.Item2)
+                        {
+                            EmailSender.SendEmail("Sign Your form", $"You Have Form That you hav'nt signed yet : {f.Topic}", context.GetAccount(tuple.Item1.Id).Email, tuple.Item1.Name, "CheckItDirector@gmail.com", "Check It", "CheckItApp123", "smtp.gmail.com");
 
+                        }
+                    }
+                    Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+
+                    return true;
+
+                }
+                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+                return false;
+            }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+            return false;
+        }
         [Route("Login2")]
         [HttpGet]
         public StaffMember Login2([FromQuery] string email, [FromQuery] string pass)

@@ -36,6 +36,8 @@ namespace CheckItApi
             //Add Controllers and set the Json Serializer to handle loop referencing
             services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions
                         .ReferenceHandler = ReferenceHandler.Preserve);
+
+
             //The following two commands set the Session state to work!
             services.AddDistributedMemoryCache();
 

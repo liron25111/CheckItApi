@@ -76,7 +76,7 @@ namespace CheckItApi.Controllers
                     {
                         if (!tuple.Item2)
                         {
-                            MailSender.SendEmail("Check It", context.GetAccount(tuple.Item1.Id).Email, tuple.Item1.Name, context.GetAccount(tuple.Item1.Id).Email, tuple.Item1.Name, "Sign Your form", $"You Have Form That you hav'nt signed yet : {f.Topic}");
+                            MailSender.SendEmail("Check It", context.GetAccount(tuple.Item1.Id).Email, tuple.Item1.Name, "Sign Your form", $"You Have Form That you hav'nt signed yet : {f.Topic}", "");
 
                         }
                     }
@@ -132,7 +132,7 @@ namespace CheckItApi.Controllers
             if (user != null)
             {
                 context.ChangePass(user.Email, pass);
-                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.Username}", "Your Password Changed", $"Your New Password is {account.Pass} ");
+                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.Username}", "Your Password Changed", $"Your New Password is {account.Pass} ","");
 
                 return user;
             }
@@ -159,7 +159,7 @@ namespace CheckItApi.Controllers
             if (user != null)
             {
                 context.ChangePassStaffMember(user.Email, pass);
-                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.MemberName}", "Your Password Changed", $"Your New Password is {account.Pass} ");
+                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.MemberName}", "Your Password Changed", $"Your New Password is {account.Pass} ","");
 
                 return user;
             }
@@ -179,13 +179,13 @@ namespace CheckItApi.Controllers
             StaffMember staffMember = context.GetStaffMemberByEmail(Email);
             if (account != null)
             {
-                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.Username}", "Password Recovery", $"Your Password is {account.Pass} ");
+                MailSender.SendEmail("Check It", $"{ account.Email}", $"{ account.Username}", "Password Recovery", $"Your Password is {account.Pass} ","");
 
                 succeed = true;
             }
             else if (staffMember != null)
             {
-                MailSender.SendEmail("Check It", $"{ staffMember.Email}", $"{ staffMember.MemberName}", "Password Recovery", $"Your Password is {staffMember.Pass} ");
+                MailSender.SendEmail("Check It", $"{ staffMember.Email}", $"{ staffMember.MemberName}", "Password Recovery", $"Your Password is {staffMember.Pass} ","");
                 succeed = true;
             }
             return succeed;
@@ -538,8 +538,13 @@ namespace CheckItApi.Controllers
         [HttpGet]
         public bool PostForm([FromQuery] string formJson, [FromQuery] string classesJson)
         {
-            Form form = System.Text.Json.JsonSerializer.Deserialize<Form>(formJson);
-            List<int> classesIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(classesJson);
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+            Form form = System.Text.Json.JsonSerializer.Deserialize<Form>(formJson, options);
+            List<int> classesIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(classesJson, options);
             if (form != null && classesIds.Count > 0 && HttpContext.Session.GetObject<StaffMember>("staffMember") != null)
             {
                 bool worked = context.PostForm(form, classesIds);
@@ -559,7 +564,7 @@ namespace CheckItApi.Controllers
                     List<Student> students = context.GetStudents(studentIds);
                     foreach(Student s in students)
                     {
-                        MailSender.SendEmail("Check It", $"{ context.GetAccount(s.Id).Email}", s.Name, "New Form", $"You Have new Form To Sign: {form.Topic}");
+                        MailSender.SendEmail("Check It", $"{ context.GetAccount(s.Id).Email}", s.Name, "New Form", $"You Have new Form To Sign: {form.Topic}","");
 
 
                     }

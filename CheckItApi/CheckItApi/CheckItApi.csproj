@@ -29,11 +29,5 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Services\SendGridLib.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 
 </Project>
